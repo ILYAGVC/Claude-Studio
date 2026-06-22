@@ -1,0 +1,39 @@
+name: Package extension
+
+# Builds the store-ready extension zip (manifest.json at the zip root + src/ + icons/,
+# forward-slash paths) so you can download it straight from GitHub — no local build needed.
+#   * Push a tag like v1.13.44  -> a GitHub Release is created with the zip attached.
+#   * Or run this workflow manually (Actions tab -> Run workflow) -> download it from the run's Artifacts.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build extension zip
+        run: |
+          VER=$(node -p "require('./manifest.json').version")
+          echo "Packaging Claude Studio v$VER"
+          zip -r "Claude-Studio-$VER.zip" manifest.json src icons
+          echo "ZIP=Claude-Studio-$VER.zip" >> "$GITHUB_ENV"
+
+      - name: Upload as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-studio-extension
+          path: ${{ env.ZIP }}
+
+      - name: Attach to GitHub Release (only when a tag is pushed)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}

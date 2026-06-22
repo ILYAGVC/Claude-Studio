@@ -751,7 +751,9 @@
     S.uiLang = lang;
     tt = I18N.dict(lang);
     I18N.apply(lang);     // full UI translation + panel direction
+    buildLangPicker();    // re-localize the language picker's own search placeholder
     buildFontPickers();   // sort fonts by language
+    buildAccentSwatches();       // re-localize the panel accent swatches' aria-label
     buildClaudeAccentSwatches(); // to translate the "no change" tooltip
     buildCodeBgSwatches();
     buildShortcuts();     // translate shortcut names
