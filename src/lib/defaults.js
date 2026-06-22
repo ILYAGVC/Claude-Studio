@@ -1,6 +1,6 @@
 /* ===================================================================
- *  Claude RTL — default values and settings schema
- *  This file is loaded globally in both the content script and the popup.
+ *  Claude RTL — default values, settings schema, and merge/validation.
+ *  Loaded globally in both the content script and the popup.
  * =================================================================== */
 (function () {
   "use strict";
@@ -20,8 +20,8 @@
     } catch (e) {}
     return "en";
   }
-  // Default body font best suited to each UI language (single source of truth,
-  // shared with the popup so the default + the language picker stay in sync).
+  // UI language -> best-fit body font. Single source of truth shared with the
+  // popup so the first-run default and the language picker stay in sync.
   const LANG_FONT = {
     fa: "Vazirmatn", ar: "Cairo", he: "Rubik", ur: "NotoNastaliqUrdu", en: "Inter",
     es: "Inter", fr: "Inter", de: "Inter", pt: "Inter", it: "Inter", nl: "Inter",
@@ -29,10 +29,9 @@
     ru: "PTSans", uk: "PTSans", hi: "NotoSansDevanagari", ja: "NotoSansJP",
     zh: "NotoSansSC", ko: "NotoSansKR", th: "NotoSansThai", bn: "NotoSansBengali", ps: "NotoNaskh"
   };
-  // UI language -> code/monospace font. Arabic-script languages use Vazirmatn so
-  // Persian/Arabic inside code renders correctly; everyone else gets a clean
-  // programming mono (JetBrains Mono covers Latin/Cyrillic/Greek, and other
-  // scripts fall back gracefully since code is overwhelmingly Latin).
+  // UI language -> code/monospace font. Arabic-script languages get Vazirmatn so
+  // Persian/Arabic inside code renders; everyone else gets JetBrains Mono (covers
+  // Latin/Cyrillic/Greek; other scripts fall back fine since code is mostly Latin).
   const LANG_CODE_FONT = {
     fa: "Vazirmatn", ar: "Vazirmatn", ur: "Vazirmatn", ps: "Vazirmatn",
     he: "JetBrainsMono", en: "JetBrainsMono", es: "JetBrainsMono", fr: "JetBrainsMono",
@@ -43,8 +42,8 @@
     bn: "JetBrainsMono"
   };
   function fontForLang(l) { return LANG_FONT[l] || "Vazirmatn"; }
-  // Languages that have their own numeral glyphs (0-9 -> these). Languages not
-  // listed use standard Western digits, so the digit-conversion option is locked.
+  // Languages with their own numeral glyphs (0-9 -> these). Unlisted languages use
+  // Western digits, so the digit-conversion option is locked for them.
   const DIGIT_LANGS = {
     fa: "۰۱۲۳۴۵۶۷۸۹", ar: "٠١٢٣٤٥٦٧٨٩", ur: "۰۱۲۳۴۵۶۷۸۹", ps: "۰۱۲۳۴۵۶۷۸۹",
     hi: "०१२३४५६७८९", bn: "০১২৩৪৫৬৭৮৯", th: "๐๑๒๓๔๕๖๗๘๙"
@@ -68,8 +67,8 @@
     font: fontForLang(detectUiLang()), // default body font follows the detected UI language
     headingFont: "inherit", // inherit = same as body text, or a font id
     codeFont: "default",    // id from CRX_FONTS.mono
-    fontWeight: "default",  // default | 100..900
-    codeFontWeight: "default", // weight for code/monospace text (default | 100..900)
+    fontWeight: "default",  // default | 100..900 (applied via font-variation-settings)
+    codeFontWeight: "default", // code/monospace weight: default | 100..900
     codeBg: "default",      // code-block background: "default" (Claude's own) or a hex colour
     allowRemoteFonts: true, // allow loading fonts from the internet (CDN)
 
@@ -102,8 +101,8 @@
     previewCollapsed: true // preview is collapsed by default
   };
 
-  // Recursively drop prototype-pollution keys from untrusted input (imported
-  // settings / presets) before merging.
+  // Strip prototype-pollution keys from untrusted input (imported settings/presets)
+  // before merging.
   function sanitize(o) {
     if (!o || typeof o !== "object") return o;
     if (Array.isArray(o)) return o.map(sanitize);
@@ -115,16 +114,15 @@
     return clean;
   }
 
-  /** Deep merge (one level) of saved settings over the defaults */
+  /** Merge saved settings over the defaults (one level deep), then validate. */
   function merge(saved) {
     const out = JSON.parse(JSON.stringify(DEFAULTS));
     saved = sanitize(saved);
     if (saved && typeof saved === "object") {
       for (const k in saved) {
         if (k === "__proto__" || k === "constructor" || k === "prototype") continue;
-        // Whitelist to known settings: silently drop any key that isn't in DEFAULTS
-        // (removed features, typos, foreign keys) so legacy values never linger in
-        // storage or show up in an export.
+        // Whitelist against DEFAULTS: drop unknown keys (removed features, typos,
+        // foreign keys) so legacy values never linger in storage or an export.
         if (!Object.prototype.hasOwnProperty.call(DEFAULTS, k)) continue;
         const v = saved[k];
         const outIsObj = out[k] && typeof out[k] === "object" && !Array.isArray(out[k]);
@@ -132,8 +130,8 @@
         if (outIsObj && vIsObj) {
           Object.assign(out[k], v);
         } else if (outIsObj && !vIsObj) {
-          // Don't replace an object default with a non-object value (null/string/broken array)
-          // so that scope/sites/presets aren't corrupted and the code doesn't crash.
+          // Never overwrite an object default with a non-object (null/string/broken
+          // array) — keeps scope/sites/presets intact and the code crash-free.
         } else if (v !== undefined) {
           out[k] = v;
         }
@@ -142,8 +140,8 @@
     // --- Migrations ---
     const sv = (saved && saved.version) || 1;
     if (sv < 2) {
-      // The old default alignment was "right", which looked wrong in LTR/auto mode;
-      // convert it to "start" (follows direction) so it works correctly with LTR/RTL/auto.
+      // v1 defaulted align to "right", which broke LTR/auto; migrate to "start"
+      // (follows direction) so it works in all of LTR/RTL/auto.
       if (!saved || saved.align === "right" || saved.align == null) out.align = "start";
     }
     // --- Clamp/validate so imported or corrupted values never reach the page out of range ---
@@ -163,7 +161,7 @@
     out.align = oneOf(out.align, ["start", "right", "center", "left", "justify"], DEFAULTS.align);
     out.claudeTheme = oneOf(out.claudeTheme, ["auto", "light", "dark", "black"], DEFAULTS.claudeTheme);
     out.theme = oneOf(out.theme, ["system", "light", "dark", "black"], DEFAULTS.theme);
-    // Accent colors are free-text hex (from import/preset) — validate at the chokepoint.
+    // Accent colors are free-text hex (from import/preset) — validate here.
     out.claudeAccent = /^#[0-9a-fA-F]{6}$/.test(out.claudeAccent) ? out.claudeAccent : "";
     out.accent = /^#[0-9a-fA-F]{6}$/.test(out.accent) ? out.accent : DEFAULTS.accent;
     out.codeBg = (out.codeBg === "default" || /^#[0-9a-fA-F]{6}$/.test(out.codeBg)) ? out.codeBg : "default";
@@ -182,13 +180,13 @@
       .replace(/url\((['"]?)([^)'"]*)\1\)/gi, function (m, q, u) {
         return /^(data:|https:\/\/(fonts\.gstatic\.com|fonts\.googleapis\.com|cdn\.jsdelivr\.net)\/)/i.test(String(u).trim()) ? m : "none";
       })
-      // Host-whitelist ANY remaining absolute URL (image-set(), bare src, etc.) — a
-      // url()-only filter misses non-url() vectors, so neutralize every off-CDN URL.
+      // Catch-all: a url()-only filter misses image-set(), bare src, etc., so
+      // host-whitelist every remaining absolute URL and blank out off-CDN ones.
       .replace(/(?:https?:)?\/\/[^\s'")]+/gi, function (u) {
         return /^https:\/\/(fonts\.gstatic\.com|fonts\.googleapis\.com|cdn\.jsdelivr\.net)\//i.test(u) ? u : "about:blank";
       });
-    // Coerce nested scope/sites flags to real booleans; a stray "no"/"0" would read
-    // as truthy via "!== false" and silently flip a disabled toggle back on.
+    // Coerce nested scope/sites flags to real booleans: a stray "no"/"0" reads as
+    // truthy under "!== false" and would silently flip a disabled toggle back on.
     ["scope", "sites"].forEach(function (key) {
       const o = out[key], d = DEFAULTS[key];
       if (o && typeof o === "object") for (const kk in o) {

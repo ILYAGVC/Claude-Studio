@@ -35,8 +35,7 @@
 }
 
 :root[data-theme="black"] {
-  /* Palette copied from ChatGPT's dark theme: pure-black page with neutral-gray
-     elevated surfaces (#212121 / #2f2f2f) and white / #cdcdcd / #afafaf text. */
+  /* ChatGPT-style dark theme: pure-black page with neutral-gray surfaces. */
   --bg: #000000;
   --bg-2: #212121;
   --bg-3: #2f2f2f;
@@ -50,8 +49,8 @@
   --accent-soft: color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
-/* Auto dark only when no explicit theme is chosen (system). Using
-   :not([data-theme]) prevents this from overriding an explicit dark/black. */
+/* Auto dark only when no explicit theme is set; :not([data-theme]) keeps it
+   from overriding an explicit light/dark/black choice. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --bg: #1f1e1c;
@@ -121,10 +120,10 @@
   transition: background 0.15s;
 }
 .info-i:hover { background: color-mix(in srgb, var(--accent) 26%, transparent); }
-/* The "i" only appears for locked (Western-numeral) languages — honor [hidden]
-   (an author display rule otherwise overrides the UA [hidden]{display:none}). */
+/* Author display rule above re-overrides UA [hidden]{display:none}, so restore it
+   explicitly — the marker shows only for locked (Western-numeral) languages. */
 .info-i[hidden] { display: none; }
-/* Vertically center the label text and its "i" marker on one line. */
+/* Keep the label text and its "i" marker on one centered line. */
 .lbl:has(.info-i) { display: inline-flex; align-items: center; }
 .toggle-row.is-locked { opacity: 0.55; }
 .toggle-row.is-locked .switch.sm { pointer-events: none; }
@@ -132,8 +131,8 @@
 .slider.is-locked { opacity: 0.5; }
 .slider.is-locked input[type="range"] { pointer-events: none; }
 
-/* Suppress transitions/animations until the first render applies the saved
-   state, so the on/off switch (and others) don't animate when the popup opens. */
+/* Suppress transitions until the first render applies saved state, so controls
+   (switches, etc.) don't animate from their default on popup open. */
 body.preload * ,
 body.preload *::before,
 body.preload *::after {
@@ -260,7 +259,7 @@ body {
   padding: 5px 11px; border-radius: 7px; cursor: pointer; transition: 0.15s;
 }
 .seg button.is-active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 2px 6px var(--accent-soft); }
-/* Alignment has 5 options — stack the label above and let the buttons fill the width equally so they always fit. */
+/* Alignment has 5 options — stack the label above so the buttons can fill the full width and always fit. */
 .align-row { flex-direction: column; align-items: stretch; gap: 8px; }
 .align-row .seg { display: flex; width: 100%; }
 .align-row .seg button { flex: 1; padding: 5px 4px; text-align: center; }
@@ -274,7 +273,7 @@ body {
 /* ---------- Toggle row ---------- */
 .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
 .toggle-row:last-child { border-bottom: none; }
-/* A toggle that owns the slider right below it (e.g. reading width) is one group — no divider between them. */
+/* A toggle owning the slider right below it (e.g. reading width) is one group — drop the divider between them. */
 .toggle-row:has(+ .slider) { border-bottom: none; }
 .toggle-row > span:first-child { display: flex; flex-direction: column; }
 .switch.sm { position: relative; width: 40px; height: 23px; flex-shrink: 0; }
@@ -302,7 +301,7 @@ body {
 .slider-head { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 600; margin-bottom: 7px; }
 .slider-head b { color: var(--accent); font-weight: 700; font-size: 12px; background: var(--accent-soft); padding: 1px 8px; border-radius: 6px; }
 input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 5px; border-radius: 4px; cursor: pointer; direction: ltr; background: linear-gradient(to right, var(--accent) var(--range-pct, 0%), var(--bg-3) var(--range-pct, 0%)); }
-/* In RTL languages, the bar starts and fills from the right */
+/* RTL: bar originates and fills from the right edge instead of the left. */
 html[dir="rtl"] input[type="range"] { direction: rtl; background: linear-gradient(to left, var(--accent) var(--range-pct, 0%), var(--bg-3) var(--range-pct, 0%)); }
 input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); box-shadow: 0 1px 5px rgba(0,0,0,0.25); cursor: pointer; transition: 0.1s; }
 input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
@@ -356,26 +355,25 @@ kbd { background: var(--bg-3); border: 1px solid var(--border-2); border-bottom-
 .prev-msg p { margin: 0 0 8px; }
 .prev-msg p:last-child { margin-bottom: 0; }
 .prev-msg .prev-h { margin: 0 0 8px; font-size: 1.15em; font-weight: 700; }
-/* Claude's sunburst mark below the sample response (uses Claude's accent).
-   Always on the LEFT, like Claude's own UI, regardless of text direction. */
+/* Claude's sunburst mark below the sample response — always LEFT-aligned, like
+   Claude's own UI, regardless of the preview's text direction. */
 .prev-claude-mark { margin-top: 12px; line-height: 0; text-align: left; color: var(--prev-accent, var(--accent)); }
 .prev-msg code { background: var(--prev-code-pill, var(--prev-code-bg, var(--bg-3))); border: 1px solid var(--prev-code-line, transparent); color: var(--prev-code-color, inherit); border-radius: 4px; padding: 1px 5px; font-family: ui-monospace, Consolas, "Courier New", monospace; font-size: 0.9em; }
-/* Mimic the site's KaTeX rendering: serif math font, italic variables, upright operator + exponent. */
+/* Mimic the site's KaTeX: serif math font, italic variables, upright operators and exponents. */
 .prev-msg .katex { font-family: "KaTeX_Math", "STIX Two Math", "Cambria Math", Georgia, "Times New Roman", serif; font-size: 1.12em; white-space: nowrap; }
 .prev-msg .katex .kvar { font-style: italic; }
 .prev-msg .katex .kop { font-style: normal; padding: 0 0.22em; }
 .prev-msg .katex .ksup { font-size: 0.72em; vertical-align: super; font-style: normal; margin-left: 0.02em; }
-/* Code block surface + syntax theme follow the selected preview theme so they harmonize:
-   a dark surface with Claude's light token palette on dark/black, a light surface with a
-   readable dark palette on light. All values are set per-theme in updatePreview(). */
+/* Code-block surface and token colors follow the selected preview theme; all the
+   --prev-* values are set per-theme in updatePreview(). */
 .prev-msg pre { background: var(--prev-codeblock-bg, var(--prev-code-bg, var(--bg-3))); border: 1px solid var(--prev-code-line, transparent); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin: 8px 0 0; }
 .prev-msg pre code { background: none; border: none; padding: 0; font-size: 0.85em; line-height: 1.6; color: var(--prev-code-base, inherit); }
 .prev-msg pre .tk-kw { color: var(--prev-tk-kw); } /* keyword (function/return) */
 .prev-msg pre .tk-fn { color: var(--prev-tk-fn); } /* function name */
 .prev-msg pre .tk-st { color: var(--prev-tk-st); } /* string */
 .prev-msg pre .tk-pu { color: var(--prev-tk-pu); } /* punctuation */
-/* "Keep code/math LTR" — gated exactly like the real site (inject.css crx-codeltr / crx-mathltr).
-   Without these the base unicode-bidi:plaintext auto-resolves Latin code to LTR. */
+/* "Keep code/math LTR" preview, gated like the real site (inject.css crx-codeltr /
+   crx-mathltr); forces LTR isolation rather than relying on bidi auto-resolution. */
 .prev-msg.prev-codeltr :is(pre, pre code, code) { direction: ltr; unicode-bidi: isolate; text-align: left; }
 .prev-msg.prev-mathltr .katex { direction: ltr; unicode-bidi: isolate; }
 
@@ -424,7 +422,7 @@ kbd { background: var(--bg-3); border: 1px solid var(--border-2); border-bottom-
 .modal-title { margin: 0 0 7px; font-size: 15px; font-weight: 700; }
 .modal-text { margin: 0 0 18px; font-size: 12px; color: var(--text-2); line-height: 1.8; }
 .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-/* confirm dialog: accent icon by default, red when it's a destructive (delete) action */
+/* Confirm dialog: accent icon by default, red for destructive (delete) actions. */
 #confirmModal .modal-icon { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 #confirmModal.is-danger .modal-icon { color: #d9534f; background: rgba(217, 83, 79, 0.12); }
 .btn-danger-solid { background: #d9534f; border-color: #d9534f; color: #fff; }
@@ -433,17 +431,17 @@ kbd { background: var(--bg-3); border: 1px solid var(--border-2); border-bottom-
 /* ---------- About made-by ---------- */
 .made-by { font-size: 12.5px; color: var(--text-2); text-align: center; margin: 0; }
 .made-by b { color: var(--accent); font-weight: 700; letter-spacing: 0.4px; }
-/* ILYAGVC — orange (accent) link to the GitHub profile. */
+/* Author credit link to the GitHub profile. */
 .made-by .by-link { color: var(--accent); font-weight: 700; letter-spacing: 0.4px; text-decoration: none; }
 .made-by .by-link:hover { text-decoration: underline; }
 .made-by .by-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .made-by .heart { display: inline-block; animation: beat 1.3s ease-in-out infinite; }
 @keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.28); } 30% { transform: scale(1); } }
-/* Project (repository) link under the credit line — full-width flex row so the
-   icon + text are reliably centered horizontally and aligned vertically. */
+/* Repository link under the credit line — full-width flex row to reliably center
+   the icon + text horizontally and align them vertically. */
 .repo-link { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 10px 0 0; color: var(--text-3); font-size: 12px; line-height: 1; text-decoration: none; direction: ltr; transition: color 0.15s; }
 .repo-link svg { flex-shrink: 0; display: block; }
-/* the Latin label has no descenders so it sits optically high next to the icon — nudge it down a hair to centre it */
+/* Latin label has no descenders, so it sits optically high next to the icon — nudge down 1px to center it. */
 .repo-link span { position: relative; top: 1px; }
 .repo-link:hover { color: var(--accent); }
 .repo-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
@@ -456,8 +454,8 @@ kbd { background: var(--bg-3); border: 1px solid var(--border-2); border-bottom-
 /* When a custom color is in use, ring the picker like a selected swatch. */
 .accent-input.is-active { border-color: var(--text); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px currentColor; }
 .accent-swatches { display: flex; gap: 8px; flex-wrap: wrap; }
-/* A double ring (light inner + dark outer) outlines every swatch so even the dark
-   code-background colours stay visible and distinct against a dark panel. */
+/* Double ring (light inner + dark outer) keeps even dark code-background swatches
+   visible and distinct against a dark panel. */
 .accent-swatch { width: 23px; height: 23px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; transition: 0.15s; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.45); }
 .accent-swatch:hover { transform: scale(1.15); }
 .accent-swatch.is-active { border-color: var(--text); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.3), 0 0 0 2px var(--bg), 0 0 0 4px currentColor; }

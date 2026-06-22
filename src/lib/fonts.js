@@ -1,15 +1,15 @@
 /* ===================================================================
  *  Claude RTL — font catalog (grouped by language)
- *  Each font: id, label, stack, group (language), load (loading source)
- *  load = null  → system/default font
+ *  Each font: { id, label, stack, group (language), load }
+ *  load = null → system/default font (no network load)
  *  load.type = 'google' → Google Fonts   |   'css' → @font-face from jsDelivr
  * =================================================================== */
 (function () {
   "use strict";
 
   const G = (family, axis) => ({ type: "google", family: family, axis: axis || "" });
-  // weights = the static weights the jsDelivr @font-face.css actually ships (so the
-  // weight slider can offer exactly those and nothing the font lacks).
+  // weights = the static weights the jsDelivr @font-face.css actually ships, so the
+  // slider offers exactly those and never a weight the font lacks (no synthetic bold).
   const J = (url, weights) => ({ type: "css", url: url, weights: weights || null });
   const JD = "https://cdn.jsdelivr.net/gh/rastikerdar/";
 

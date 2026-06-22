@@ -50,7 +50,7 @@
   // Code-box background presets (all dark, so Claude's light syntax colours stay readable).
   // Index 0 is the "default" swatch (no override → Claude's own / auto-dark behaviour).
   const CODE_BGS = ["#2c2b28", "#000000", "#0d1117", "#1e1e1e", "#282c34", "#1a1b26", "#0f1c2e"];
-  // Localized label for the code-font weight slider (kept here so i18n.js stays untouched).
+  // Localized labels kept here (not in i18n.js) so that file stays untouched.
   const CODE_WEIGHT_TXT = {
     fa: "ضخامت فونت کد", ar: "سماكة خط الشيفرة", he: "עובי גופן הקוד", ur: "کوڈ فونٹ کی موٹائی",
     en: "Code font weight", es: "Grosor de la fuente de código", fr: "Graisse de la police de code", de: "Schriftstärke des Codes",
@@ -99,12 +99,10 @@
     return new Promise((res) => chrome.storage.local.get(KEY, (o) => res(window.CRX_merge(o && o[KEY]))));
   }
   let saveTimer = null;
-  // Serialized payloads we have written to storage but whose own onChanged echo has
-  // not arrived yet. Every chrome.storage.local.set echoes back through the popup's
-  // own onChanged listener; matching against this queue lets us drop our own echoes
-  // wholesale, so a delayed echo can never revert an in-flight edit (e.g. a weight
-  // drag) to a stale value. Holds multiple entries because several debounced writes
-  // can be in flight at once.
+  // Serialized payloads written to storage but whose own onChanged echo hasn't arrived
+  // yet. Every set() echoes back through our own onChanged listener; matching against
+  // this queue drops our echoes so a delayed one can't revert an in-flight edit (e.g. a
+  // weight drag). Holds multiple entries since several debounced writes can be in flight.
   let pendingWrites = [];
   function persist() {
     const json = JSON.stringify(S);
@@ -356,9 +354,9 @@
   let csFont, csHeading, csCode, csLang;
   // ---- weight sliders adapt to each font's real, shipped weights ----
   // weightLists[id] is the ascending list of weights backing that slider. The range
-  // input is index-based: 0 = "default" (Claude's own weight), 1..N = the font's
-  // actual weights — so the slider only stops on weights the font really has, and a
-  // single-weight font locks the slider instead of pretending to offer a range.
+  // input is index-based: 0 = "default" (Claude's own weight), 1..N = the font's real
+  // weights — so it only stops on weights the font ships, and a single-weight font locks
+  // the slider instead of faking a range.
   const weightLists = { fontWeight: [], codeFontWeight: [] };
   function fullWeightRange() { const a = []; for (let w = 100; w <= 900; w += 100) a.push(w); return a; }
   function buildWeightTicks(id, n) {
@@ -516,18 +514,16 @@
     st.setProperty("letter-spacing", S.letterSpacing + "px");
     st.setProperty("word-spacing", S.wordSpacing + "px");
     st.setProperty("text-align", S.align);
-    // NB: body weight is applied to the paragraphs (and, when non-default, the heading) below
-    // — not here on the container — so it matches the site, where --crx-weight targets p/li and
-    // (via crx-weight) headings, leaving code independent. Setting it on the container would
-    // leak the body weight into the code block.
-    // preview direction follows the rtlMode SETTING (like the real site), not the UI
-    // language; "auto" falls back to the sample text's own (UI-language) direction.
+    // Body weight is applied to paragraphs (and the heading) below, NOT here on the
+    // container — mirroring the site (--crx-weight targets p/li + headings, leaving code
+    // independent). On the container it would leak into the code block.
+    // Direction follows the rtlMode SETTING (like the site), not the UI language;
+    // "auto" falls back to the sample text's own (UI-language) direction.
     st.setProperty("direction", S.rtlMode === "auto" ? I18N.dirOf(S.uiLang) : S.rtlMode);
 
-    // The preview mirrors CLAUDE's own appearance (its theme + accent), not the
-    // settings panel's theme — so it shows how Claude itself will look.
-    // [page bg, body text, muted text, code surface] — measured from the live site so the
-    // preview matches exactly (light/dark = Claude native, black = the extension's black theme).
+    // Preview mirrors CLAUDE's appearance (its theme + accent), not the settings panel's.
+    // [page bg, body text, muted text, code surface] — measured from the live site
+    // (light/dark = Claude native, black = the extension's black theme).
     const CT = {
       light: ["#f8f8f6", "#0b0b0b", "#7b7974", "#ecebe6"],
       dark: ["#1f1f1e", "#ffffff", "#97958c", "#2c2b28"],
@@ -546,31 +542,30 @@
     // Claude's brand coral (--cds-clay) is #d97757 in every theme — match it exactly for the
     // "no override" default so the preview mark equals the real site.
     st.setProperty("--prev-accent", accentSet ? S.claudeAccent : "#d97757");
-    // inline code: with a custom accent, follow it (same theme-aware shade as the
-    // real site — brighter on dark/black, darker on light). With NO override, show
-    // Claude's own default inline-code colour (--danger-000): deep red on light,
-    // soft red on dark/black — instead of leaving it body-coloured.
+    // Inline code: with a custom accent, follow it (theme-aware shade — brighter on
+    // dark/black, darker on light). With NO override, use Claude's own inline-code colour
+    // (--danger-000): deep red on light, soft red on dark/black — not body-coloured.
     st.setProperty("--prev-code-color", accentSet
       ? accentShade(S.claudeAccent, ck === "light" ? -16 : 14)
       : (ck === "light" ? "hsl(0 58% 35%)" : "hsl(0 77% 81%)"));
     st.setProperty("--prev-code-bg", cc[3]);
-    // Code BLOCK: Claude renders code blocks dark in EVERY theme (syntax colours are baked
+    // Code BLOCK: Claude renders blocks dark in EVERY theme (syntax colours are baked
     // light), and the extension pins them dark on-site in light mode too — so the preview
-    // mirrors that exactly: a dark surface + Claude's light token palette in every theme.
+    // matches: a dark surface + Claude's light token palette in every theme.
     st.setProperty("--prev-codeblock-bg", /^#[0-9a-fA-F]{6}$/.test(S.codeBg) ? S.codeBg : (ck === "light" ? "#2c2b28" : cc[3]));
     st.setProperty("--prev-code-base", "#eaecf0");
     st.setProperty("--prev-tk-kw", "#cc7bf4"); // keyword
     st.setProperty("--prev-tk-fn", "#70b8ff"); // function name
     st.setProperty("--prev-tk-st", "#9be963"); // string
     st.setProperty("--prev-tk-pu", "#d3d7de"); // punctuation
-    // inline-code PILL: a translucent neutral tint of the theme's own text colour
-    // (matches the real site's text-200/5 pill) — the accent is only the text, not the bg.
+    // Inline-code PILL: a translucent tint of the theme's text colour (matches the
+    // site's text-200/5 pill) — the accent tints only the text, not the bg.
     st.setProperty("--prev-code-pill", "color-mix(in srgb, " + cc[1] + " 5%, transparent)");
     st.setProperty("--prev-code-line", "color-mix(in srgb, " + cc[1] + " 15%, transparent)");
 
-    // effective weights: apply a chosen weight only when the active font actually ships
-    // more than one weight (mirrors content.js — a single-weight font's slider is locked,
-    // so a leftover weight must not synthesize fake bold).
+    // Effective weights: apply a chosen weight only when the font ships more than one
+    // (mirrors content.js — a single-weight font's slider is locked, so a leftover weight
+    // must not synthesize fake bold).
     const _bs = FONTS.weightStops(FONTS.get("text", S.font));
     const effBodyWeight = S.fontWeight !== "default" && !(_bs && _bs.length <= 1) ? FONTS.nearestWeight(FONTS.get("text", S.font), S.fontWeight) : "";
     const _cs = FONTS.weightStops(FONTS.get("mono", S.codeFont));
@@ -583,14 +578,14 @@
       el.style.letterSpacing = "normal";
       el.style.wordSpacing = "normal";
     });
-    // "Keep math/code LTR" toggles: gate the preview's forced-LTR exactly like the
-    // real site (inject.css crx-codeltr / crx-mathltr). When off, code/math follow
-    // the preview's own direction instead of being pinned left.
+    // "Keep math/code LTR" toggles: gate the preview's forced-LTR like the site
+    // (inject.css crx-codeltr / crx-mathltr). When off, code/math follow the preview's
+    // own direction instead of being pinned left.
     prev.classList.toggle("prev-codeltr", !!S.keepCodeLtr);
     prev.classList.toggle("prev-mathltr", !!S.keepMathLtr);
     // In "auto" direction mode, code & math auto-detect their own (Latin) direction so they
-    // render LTR — exactly like the site (verified: auto mode → Latin code is LTR even in an
-    // RTL page). In an explicit rtl/ltr mode they inherit the message direction instead.
+    // render LTR — like the site (Latin code stays LTR even on an RTL page). In an explicit
+    // rtl/ltr mode they inherit the message direction instead.
     const autoDir = S.rtlMode === "auto";
     prev.querySelectorAll("pre, code, .katex").forEach((el) => {
       if (autoDir) el.setAttribute("dir", "auto");
@@ -1232,9 +1227,8 @@
     if (area !== "local" || !changes[KEY]) return;
     const oldV = changes[KEY].oldValue || {};
     const newV = changes[KEY].newValue || {};
-    // Drop the echo of one of our own writes (whatever its value) so it can never
-    // clobber a newer in-flight edit. External writes won't match the queue and fall
-    // through to per-key reconciliation below.
+    // Drop the echo of one of our own writes so it can't clobber a newer in-flight edit.
+    // External writes won't match the queue and fall through to per-key reconciliation below.
     const echoIdx = pendingWrites.indexOf(JSON.stringify(newV));
     if (echoIdx !== -1) { pendingWrites.splice(echoIdx, 1); return; }
     // Apply only the keys that actually changed externally, so a concurrent

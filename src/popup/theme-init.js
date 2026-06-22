@@ -1,15 +1,14 @@
 /* ===================================================================
  *  Claude Studio — settings panel theme bootstrap
- *  Applies the last-used panel theme + accent SYNCHRONOUSLY, before the
- *  first paint, so the popup never flashes the default theme while the
- *  async chrome.storage read is still in flight. popup.js keeps these
- *  localStorage mirrors up to date on every theme/accent change.
- *  (Must stay an external file — the extension CSP forbids inline scripts.)
+ *  Applies the last-used theme + accent synchronously before first paint
+ *  to avoid a default-theme flash while the async chrome.storage read is
+ *  in flight; popup.js keeps these localStorage mirrors current. Must stay
+ *  an external file — the extension CSP forbids inline scripts.
  * =================================================================== */
 (function () {
   try {
     var t = localStorage.getItem("crx_theme");
-    // "system" (or unset) intentionally leaves data-theme off so the CSS
+    // "system"/unset deliberately leaves data-theme off so the CSS
     // prefers-color-scheme fallback applies — matches applyTheme().
     if (t === "light" || t === "dark" || t === "black") {
       document.documentElement.setAttribute("data-theme", t);

@@ -18,28 +18,25 @@
   let modeObserver = null;
 
   /* ---------- orphan-instance shutdown ----------
-   * After an extension reload/update the previous content script keeps running
-   * in the page (its observers still fire) but can no longer reach the extension
-   * APIs, so it stops reacting to settings changes. A fresh instance broadcasts
-   * "crx:shutdown" so the stale one disables itself, then this instance takes
-   * over and reconciles the DOM. The new instance dispatches BEFORE registering
-   * its own listener, so it never shuts itself down. */
+   * After a reload/update the previous content script keeps running with stale
+   * observers but a dead extension context. A fresh instance broadcasts
+   * "crx:shutdown" to retire the old one, then reconciles the DOM. We dispatch
+   * BEFORE registering our own listener, so we never shut ourselves down. */
   let aborted = false;
   function selfShutdown(fullCleanup) {
     aborted = true;
     if (observer) { observer.disconnect(); observer = null; }
     if (modeObserver) { modeObserver.disconnect(); modeObserver = null; }
     modePending = false;
-    // Restore Claude's real theme/accent so a re-injected successor captures the
-    // correct original mode, and so a disabled extension leaves nothing forced.
+    // Restore Claude's real theme/accent so a successor captures the correct
+    // original mode, and so a disabled extension leaves nothing forced.
     try { revertMode(); removeClaudeBlack(); removeClaudeAccent(); } catch (e) {}
-    // No successor (context truly gone) -> also strip our RTL marks from the page.
+    // No successor (context truly gone) -> also strip our RTL marks.
     if (fullCleanup) { try { teardown(); } catch (e) {} }
   }
-  // True while this content script can still reach the extension APIs. After an
-  // extension reload the old instance's context is invalidated; it then shuts
-  // itself down on the next observer tick, even if the "crx:shutdown" event
-  // never reached it (e.g. if it lives in a separate isolated world).
+  // True while this content script can still reach the extension APIs. A reloaded
+  // instance whose context is invalidated shuts itself down on the next observer
+  // tick — even if "crx:shutdown" never reached it (e.g. separate isolated world).
   function contextValid() {
     try { return !!(chrome.runtime && chrome.runtime.id); } catch (e) { return false; }
   }
@@ -119,17 +116,17 @@
   }
 
   /* ---------- CSS variables and classes ---------- */
-  // The chosen weight, but only when the active font actually ships more than one
-  // weight. A single-weight font has a locked slider, so a weight left over from a
-  // previous multi-weight font must NOT be applied (it would synthesize fake bold and
+  // Resolve the chosen variable-font weight, but only when the active font ships
+  // more than one weight. A single-weight font locks the slider, so a weight left
+  // over from a previous font must NOT apply (it would synthesize fake bold and
   // contradict the locked control). Returns "inherit" (no override) in that case.
   function effWeight(kind, fontId, weight) {
     if (weight === "default") return "inherit";
     const f = FONTS.get(kind, fontId);
     const stops = FONTS.weightStops(f);
-    if (stops && stops.length <= 1) return "inherit"; // single-weight font: slider locked, apply nothing
-    // Clamp to a real stop so a weight carried over from another font is never applied
-    // out of range (synthesized bold / mismatch with the snapped slider display).
+    if (stops && stops.length <= 1) return "inherit"; // single-weight font: slider locked
+    // Snap to a real stop so a carried-over weight never lands out of range
+    // (synthesized bold / mismatch with the snapped slider display).
     return FONTS.nearestWeight(f, weight);
   }
   function setVars() {
@@ -156,9 +153,9 @@
     cl.toggle("crx-user", !!settings.scope.user);
     cl.toggle("crx-input", !!settings.scope.input);
     cl.toggle("crx-chatlist", !!settings.scope.chatList);
-    // Gate font-family on the RESOLVED stack so "default" (stack "inherit") never emits
-    // font-family: inherit !important — which would override Claude's element-specific font
-    // (e.g. its serif response body) instead of leaving it untouched.
+    // Gate font-family on the RESOLVED stack: "default" resolves to "inherit", and
+    // emitting font-family: inherit !important would override Claude's element-specific
+    // fonts (e.g. its serif response body) instead of leaving them untouched.
     cl.toggle("crx-font", textStack() !== "inherit");
     cl.toggle("crx-headfont", headStack() !== "inherit");
     cl.toggle("crx-weight", effWeight("text", settings.font, settings.fontWeight) !== "inherit");
@@ -206,13 +203,12 @@
     return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
   }
   // Claude's accent lives in TWO token families: the coral BRAND tokens
-  // (--brand-*, --cds-clay*) drive the prominent accent — the logo, primary/send
-  // buttons, highlights — while the --accent-* family is a secondary (now purple)
-  // ramp. A custom accent recolors both so every accent-colored element matches.
-  // (--brand-900 is deliberately left alone: it is the dark text drawn ON the accent.)
-  // Claude redeclares the accent tokens locally on every .cds-root, so an inline
-  // override on <html> never reaches elements inside those scopes. Inject an
-  // !important rule across all scopes so a custom accent is truly universal.
+  // (--brand-*, --cds-clay*) drive the prominent accent (logo, primary/send
+  // buttons, highlights), while --accent-* is a secondary (purple) ramp. A custom
+  // accent recolors both. --brand-900 is left alone: it is the dark text drawn ON
+  // the accent. Claude redeclares these tokens on every .cds-root, so an inline
+  // override on <html> can't reach those scopes — inject an !important rule across
+  // all scopes so a custom accent is truly universal.
   function setAccentCss(decl) {
     let el = document.getElementById("crx-accent-css");
     if (!decl) { if (el) el.remove(); return; }
@@ -222,10 +218,9 @@
       el.setAttribute("data-crx", "1");
       (document.head || ROOT).appendChild(el);
     }
-    // Tint inline code to the accent too — but ONLY here (inside the custom-accent
+    // Tint inline code to the accent too, but ONLY here (inside the custom-accent
     // style), so the default "no change" state leaves Claude's own code colour.
-    // Inline code follows the accent in EVERY Claude theme: a brighter shade on
-    // dark/black backgrounds, a darker shade on light — so it stays readable.
+    // Use a brighter shade on dark/black backgrounds, a darker one on light.
     const css = ":root,[data-mode],.cds-root{" + decl + "}" +
       'html[data-mode="dark"] :not(pre)>code,html[data-crxblack="1"] :not(pre)>code{color:var(--crx-accent-bright)!important}' +
       'html[data-mode="light"] :not(pre)>code{color:var(--crx-accent-dark)!important}';
@@ -254,10 +249,9 @@
           "--accent-100:" + trip(62) + "!important;" +
           "--accent-200:" + trip(62) + "!important;" +
           "--accent-900:" + trip(22) + "!important;" +
-          // accent shades for accent-coloured TEXT (inline code): a brighter one for
-          // dark backgrounds, a darker one for light — readable in any Claude theme.
-          // symmetric clamp: keep the bright shade legible on dark (>=58) and the
-          // dark shade legible on light (<=50), so even a near-black/near-white accent works.
+          // Accent shades for accent-coloured TEXT (inline code). Symmetric clamp:
+          // keep the bright shade legible on dark (>=58) and the dark shade legible
+          // on light (<=50), so even a near-black/near-white accent stays readable.
           "--crx-accent-bright:" + col(Math.min(90, Math.max(58, c.l + 14))) + ";" +
           "--crx-accent-dark:" + col(Math.max(28, Math.min(50, c.l - 16))) + ";";
         setAccentCss(d);
@@ -266,11 +260,10 @@
     }
     removeClaudeAccent();
   }
-  // Black theme for Claude — ChatGPT-inspired, tuned for a bright, high-legibility
-  // look: pure-black page (#000), a dark composer/card surface (--bg-000), and a
-  // white-leaning text ramp so even the muted tiers stay readable across the site.
-  // The --border-* tokens MUST be overridden too: Claude leaves them at a light
-  // warm value (53 12% 87%) which would render as bright lines on black.
+  // Black theme: pure-black page (#000), dark composer/card surface (--bg-000),
+  // white-leaning text ramp so even muted tiers stay readable. --border-* MUST be
+  // overridden too — Claude's default light warm value (53 12% 87%) would render
+  // as bright lines on black.
   const BLACK_VARS = {
     "--bg-000": "0 0% 11%", "--bg-100": "0 0% 0%", "--bg-200": "0 0% 8%",
     "--bg-300": "0 0% 25%", "--bg-400": "0 0% 13%", "--bg-500": "0 0% 13%",
@@ -279,26 +272,26 @@
     "--text-000": "0 0% 100%", "--text-100": "0 0% 100%", "--text-200": "0 0% 92%",
     "--text-300": "0 0% 84%", "--text-400": "0 0% 74%", "--text-500": "0 0% 66%"
   };
-  // .cds-root[data-mode] elements redeclare the --bg/--text vars locally and
-  // override the value set on <html>, so they must be set inline on each of
-  // those elements too (otherwise the sidebar etc. stay their default color).
+  // .cds-root[data-mode] elements redeclare --bg/--text locally, overriding the
+  // value on <html>, so they must be painted inline too (else the sidebar etc.
+  // keep their default color).
   function paintBlack(el) { if (el.getAttribute("data-crxblack") === "1") return; for (const k in BLACK_VARS) el.style.setProperty(k, BLACK_VARS[k]); el.setAttribute("data-crxblack", "1"); }
   function unpaintBlack(el) { if (el.getAttribute("data-crxblack") !== "1") return; for (const k in BLACK_VARS) el.style.removeProperty(k); el.removeAttribute("data-crxblack"); }
   function blackScopes() { return [ROOT, ...document.querySelectorAll("[data-mode]")]; }
   // Modals, dropdowns, tooltips and panels paint from a SEPARATE --cds-surface-*
-  // family (warm hex values like #2c2c2a / #383835) that the --bg-* tokens do not
-  // cover. Re-map them to neutral ChatGPT-style grays so every portal matches.
+  // family (warm hex values like #2c2c2a / #383835) not covered by --bg-*. Re-map
+  // them to neutral grays so every portal matches.
   const SURFACE_VARS = {
     "--cds-surface-0": "#080808", "--cds-surface-1": "#0d0d0d",
     "--cds-surface-2": "#141414", "--cds-surface-panel": "#141414",
     "--cds-surface-3": "#1c1c1c", "--cds-surface-popover": "#1c1c1c",
     "--cds-tooltip-bg": "#1c1c1c"
   };
-  // A CSS rule (not just the inline painting above) is what themes dynamically
-  // mounted portals: modals/dropdowns/tooltips live outside the painted tree and
-  // redeclare tokens locally, so they need an !important rule on every scope. The
-  // rule also lifts muted sidebar/menu icons (--text-500) to the bright label color
-  // so each row reads as a single color.
+  // The inline painting above can't reach dynamically mounted portals
+  // (modals/dropdowns/tooltips live outside the painted tree and redeclare tokens
+  // locally), so an !important rule on every scope themes them. It also lifts muted
+  // sidebar/menu icons (--text-500) to the bright label color so each row reads as
+  // one color.
   function buildBlackCss() {
     const scope = 'html[data-crxblack="1"],html[data-crxblack="1"] [data-mode],html[data-crxblack="1"] .cds-root';
     let d = "";
@@ -309,10 +302,9 @@
       'html[data-crxblack="1"] :is(a,button,[role="button"]) svg.text-text-500{color:hsl(var(--text-000))!important}' +
       // neutral selection highlight so selected text stays readable on pure black
       'html[data-crxblack="1"] ::selection{background:hsl(0 0% 100% / 0.22)!important}' +
-      // inline code pills: only a subtle dark fill + border so the box matches the
-      // dark theme. The TEXT colour is left as Claude's own — it is tinted to the
-      // accent ONLY while a custom Claude accent is set (see setAccentCss), so the
-      // default "no change" state recolours nothing.
+      // inline code pills: subtle dark fill + border to match the dark theme. Text
+      // colour stays Claude's own — it is tinted to the accent ONLY while a custom
+      // accent is set (see setAccentCss), so the default state recolours nothing.
       'html[data-crxblack="1"] :not(pre)>code{background-color:hsl(0 0% 100% / 0.06)!important;border:1px solid hsl(0 0% 100% / 0.14)!important}';
   }
   const BLACK_CSS = buildBlackCss();
@@ -336,14 +328,14 @@
   const MODE_OBS_OPTS = { attributes: true, attributeFilter: ["data-mode"], subtree: true, childList: true };
   let originalMode; // undefined = nothing forced | null = original had no attribute | string = original value
   function forceMode(mode) {
-    if (modeObserver) modeObserver.disconnect(); // avoid the observer firing on our own changes
+    if (modeObserver) modeObserver.disconnect(); // don't let the observer fire on our own changes
     const black = active() && settings.claudeTheme === "black";
     const set = (el) => {
       if (mode) {
         if (el.getAttribute("data-mode") !== mode) {
-          // Stash the original value the first time we touch this element (a real
-          // value, or "" if absent) so revert restores it EXACTLY — even when we
-          // are overwriting a data-mode Claude itself had already set.
+          // Stash the original value (a real value, or "" if absent) on first touch
+          // so revert restores it EXACTLY, even when overwriting a data-mode Claude
+          // itself had set.
           if (!el.hasAttribute("data-crxmode")) {
             el.setAttribute("data-crxprevmode", el.getAttribute("data-mode") || "");
             el.setAttribute("data-crxmode", "1");
@@ -357,7 +349,7 @@
         el.removeAttribute("data-crxmode");
         el.removeAttribute("data-crxprevmode");
       }
-      if (black) paintBlack(el); else unpaintBlack(el); // freshly created elements get painted/cleared too
+      if (black) paintBlack(el); else unpaintBlack(el); // paint/clear freshly created elements too
     };
     set(ROOT);
     document.querySelectorAll("[data-mode]").forEach((el) => { if (el !== ROOT) set(el); });
@@ -371,10 +363,10 @@
   }
   function revertMode() {
     if (originalMode === undefined) return;
-    // Always route through the clearing branch: it restores each element's OWN saved
-    // data-crxprevmode and strips our data-crxmode/data-crxprevmode markers. Passing the
-    // global originalMode would overwrite data-mode but leave those markers behind,
-    // corrupting later capture/revert bookkeeping. (originalMode is only a "was forced" flag.)
+    // Route through the clearing branch: it restores each element's OWN saved
+    // data-crxprevmode and strips our markers. Passing the global originalMode would
+    // overwrite data-mode but leave the markers behind, corrupting later
+    // capture/revert bookkeeping. (originalMode is only a "was forced" flag.)
     forceMode(null);
     originalMode = undefined;
   }
@@ -401,7 +393,7 @@
       if (!contextValid()) { selfShutdown(true); return; }
       if (!settings.claudeTheme || settings.claudeTheme === "auto") return;
       for (const m of muts) {
-        // only on data-mode changes or when a node carrying data-mode is added (not every text stream)
+        // react only to data-mode changes or added nodes carrying data-mode (skip the text stream)
         if (m.type === "attributes" || addedHasDataMode(m)) { scheduleForce(); break; }
       }
     });
@@ -479,9 +471,8 @@
   function alignUserBubble(userEl) {
     const col = userEl.closest(".flex.flex-col.items-end");
     if (!col) return;
-    // Only mirror the bubble to the content's direction in "auto" mode. In a
-    // forced rtl/ltr mode the computed direction is the forced one, not the
-    // content's, so leave Claude's default bubble placement.
+    // Only mirror the bubble in "auto" mode. Under a forced rtl/ltr the computed
+    // direction is the forced one, not the content's, so leave Claude's default.
     if (!settings.scope.user || settings.rtlMode !== "auto") {
       if (col.hasAttribute("data-crxalign")) { col.style.removeProperty("align-items"); col.removeAttribute("data-crxalign"); }
       return;
@@ -515,15 +506,15 @@
   function convertDigits(blockEl, allowAnchor) {
     if (!activeDigits()) return; // current UI language uses standard Western digits
     // Never rewrite numerals inside the live editor: converting a typed Western
-    // digit to its Eastern form would send Eastern digits to Claude and desync
-    // ProseMirror's model (caret jumps, dropped chars). Direction is applied separately.
+    // digit would send Eastern digits to Claude and desync ProseMirror's model
+    // (caret jumps, dropped chars). Direction is applied separately.
     if (blockEl.closest && blockEl.closest('[contenteditable="true"], [contenteditable=""], .ProseMirror')) return;
     // By default skip links so digits inside inline URLs/refs are left alone.
     // The sidebar chat list is itself an <a>, so it passes allowAnchor=true.
     const skipSel = allowAnchor ? SEL_SKIP : SEL_SKIP + ",a";
-    // Preserve a user's text selection across the in-place node rewrite (e.g. selecting
-    // a response while a UI-language switch re-localizes its digits). The live composer is
-    // already bailed out above; each Latin digit maps to one Eastern digit, so offsets stay valid.
+    // Preserve the user's text selection across the in-place rewrite (e.g. a response
+    // re-localized on a UI-language switch). Each Latin digit maps to one Eastern
+    // digit, so offsets stay valid; the live composer already bailed out above.
     const sel = window.getSelection ? window.getSelection() : null;
     let savedSel = null;
     if (sel && sel.rangeCount && sel.anchorNode && blockEl.contains(sel.anchorNode)) {
@@ -532,14 +523,10 @@
     const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, {
       acceptNode: function (n) {
         if (!n.nodeValue) return NodeFilter.FILTER_REJECT;
-        // Only claim a node we can prove is ours: it currently contains Latin
-        // digits (fresh), or we already converted it (so a UI-language switch can
-        // re-localize it). Never adopt a node whose digits are genuinely Eastern
-        // (e.g. Arabic content Claude rendered) — converting it would rewrite and
-        // then lose Claude's own glyphs when restored.
         // Adopt a node only if it is provably ours: it has Latin digits AND no
-        // genuine Eastern digits (a mixed node would lose Claude's own glyphs), or
-        // we already converted it (so a UI-language switch can re-localize it).
+        // genuine Eastern digits (a mixed node, e.g. Arabic content Claude rendered,
+        // would lose Claude's own glyphs on restore), or we already converted it (so
+        // a UI-language switch can re-localize it).
         if (!touchedDigitNodes.has(n) && (!/[0-9]/.test(n.nodeValue) || hasEastern(n.nodeValue))) return NodeFilter.FILTER_REJECT;
         const p = n.parentElement;
         if (p && p.closest(skipSel)) return NodeFilter.FILTER_REJECT;
@@ -548,8 +535,8 @@
     });
     let n;
     while ((n = walker.nextNode())) {
-      // Cache a pristine Latin baseline (even if the node is partly converted
-      // already — mixed Eastern and Western digits while typing), so restore never writes mixed text.
+      // Cache a pristine Latin baseline (even for a partly-converted node — mixed
+      // Eastern/Western digits while typing) so restore never writes mixed text.
       const latin = toLatin(n.nodeValue);
       digitOriginals.set(n, latin);
       const loc = toLocal(latin);
@@ -566,8 +553,8 @@
     touchedDigitNodes.forEach((n) => {
       if (!n.isConnected) return; // detached node — leave it alone
       const orig = digitOriginals.get(n);
-      // Only restore when the text still has Persian digits (our conversion is
-      // still in place); if React changed it to something else, don't clobber it.
+      // Only restore while our conversion is still in place (text still has Eastern
+      // digits); if React replaced the text, don't clobber it.
       if (orig != null && n.nodeValue !== orig && hasEastern(n.nodeValue)) n.nodeValue = orig;
     });
     touchedDigitNodes.clear();
@@ -658,7 +645,7 @@
           if (n.nodeType === 1) schedule(n);
         });
         if (m.type === "characterData" && settings.persianDigits && /[0-9]/.test(m.target.nodeValue || "")) {
-          const p = m.target.parentElement; // ignore our own Persian-only writes (no Latin digit left)
+          const p = m.target.parentElement; // the /[0-9]/ test above ignores our own Eastern-only writes
           if (p) schedule(p);
         }
       }
@@ -733,9 +720,8 @@
     }
   });
 
-  /* Re-sync when the tab regains visibility/focus — guarantees settings changes
-     apply live even if a storage event was missed. Re-applies only when the
-     settings actually changed (avoids needless reprocessing). Safe on an
+  /* Re-sync on tab visibility/focus so settings still apply if a storage event was
+     missed. Re-applies only when the settings actually changed; safe on an
      invalidated context. */
   function resync() {
     if (aborted) return;

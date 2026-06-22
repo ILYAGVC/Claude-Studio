@@ -1,13 +1,12 @@
 /* ===================================================================
  *  Claude RTL — styles injected into the Claude page
- *  Everything is gated behind the html.crx-* classes so that nothing
- *  is changed while the extension is turned off.
+ *  Everything is gated behind html.crx-* classes, so nothing applies
+ *  while the extension is off.
  *
- *  Region selectors (matching Claude's current structure):
+ *  Region selectors (Claude's current structure; legacy classes kept):
  *    Claude response : .font-claude-response / .font-claude-response-body
  *    User message    : [data-testid="user-message"] / .!font-user-message
  *    Compose box     : .ProseMirror
- *  (Old classes are kept for backward compatibility)
  * =================================================================== */
 
 :root {
@@ -50,8 +49,8 @@ html.crx-active.crx-headfont.crx-user :is([data-testid="user-message"], [class~=
   font-family: var(--crx-headfont) !important;
 }
 
-/* heading weight follows the chosen body weight, but only when a non-default weight
-   is set — applying the default (inherit) would strip Claude's heading boldness */
+/* Headings follow the chosen body weight; gated by crx-weight so the default
+   (inherit) doesn't strip Claude's native heading boldness. */
 html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(h1, h2, h3, h4, h5, h6),
 html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(h1, h2, h3, h4, h5, h6) {
   font-weight: var(--crx-weight) !important;
@@ -72,20 +71,18 @@ html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!
 }
 
 /* ---------- variable-font weight: force the "wght" axis too ----------
-   For a VARIABLE font, font-variation-settings "wght" overrides the font-weight
-   property for glyph rendering. Claude sets font-variation-settings:"wght" ~360 on
-   [data-cds-anim], so without this the chosen weight never renders for variable fonts
-   (e.g. Vazirmatn). Gated by crx-weight so the default value (inherit) — which is
-   invalid inside font-variation-settings — never reaches this property. Setting
-   "wght" N is harmless for static fonts (no wght axis -> ignored). */
+   On a variable font, font-variation-settings "wght" overrides font-weight for
+   glyph rendering. Claude pins "wght" ~360 on [data-cds-anim], so without this the
+   chosen weight never renders for variable fonts (e.g. Vazirmatn). Gated by crx-weight:
+   the default (inherit) is invalid inside font-variation-settings. Harmless on static
+   fonts (no wght axis -> ignored). */
 html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption),
 html.crx-active.crx-weight.crx-asst :is(p.font-claude-response-body),
 html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(h1, h2, h3, h4, h5, h6),
 html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption),
 html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(h1, h2, h3, h4, h5, h6) {
   font-variation-settings: "wght" var(--crx-weight) !important;
-  /* "wght"-only above replaces Claude's whole declaration (incl. its "opsz"); let the
-     optical-size axis fall back to automatic size-driven sizing instead of the font default. */
+  /* "wght"-only above drops Claude's "opsz"; restore automatic size-driven optical sizing. */
   font-optical-sizing: auto !important;
 }
 
@@ -95,8 +92,8 @@ html.crx-active.crx-asst :is(.font-claude-response, .font-claude-message, [data-
 }
 
 /* ---------- fix Claude's asymmetric padding for RTL ----------
-   Claude gives the response text padding-left:8px and padding-right:32px (for LTR).
-   With logical padding, these values automatically flip with the direction so they stay symmetric in RTL too. */
+   Claude's response text has padding-left:8px / padding-right:32px (LTR). Restated as
+   logical padding so the values flip with direction and stay correct in RTL. */
 html.crx-active.crx-asst :is(.standard-markdown, .progressive-markdown) :is(p, blockquote, h1, h2, h3, h4, h5, h6) {
   padding-inline-start: 0.5rem !important;
   padding-inline-end: 2rem !important;
@@ -141,9 +138,9 @@ html.crx-active.crx-weight.crx-input .ProseMirror :is(p, li, ul, ol, blockquote)
 }
 
 /* ---------- code font (when enabled) ----------
-   Reset font-feature-settings too: Claude bakes "calt" 0, "liga" 0 onto code, which would
-   kill the ligatures that are the whole point of fonts like Fira Code / JetBrains Mono.
-   Gated by crx-codefont so the default (Claude's own mono) keeps Claude's settings. */
+   Reset feature-settings/ligatures: Claude bakes "calt" 0, "liga" 0 onto code, killing the
+   ligatures that are the whole point of Fira Code / JetBrains Mono. Gated by crx-codefont so
+   the default (Claude's own mono) keeps Claude's settings. */
 html.crx-active.crx-codefont :is(pre, pre *, code, kbd, samp) {
   font-family: var(--crx-codefont) !important;
   font-feature-settings: normal !important;
@@ -163,19 +160,17 @@ html.crx-active.crx-codeweight :is(pre, pre *, code, kbd, samp) {
 }
 
 /* ---------- light-mode code-block readability ----------
-   Claude bakes code-block syntax colours light (designed for an always-dark block), but in
-   light mode the block background follows the theme to white and the highlighting washes
-   out (light text on white). Pin the code area dark so the syntax stays readable; the header
-   strip (language label + copy button) sits on the light wrapper and is left untouched. */
+   Claude's syntax colours assume an always-dark block, but in light mode the block bg follows
+   the theme to white and highlighting washes out (light text on white). Pin the code area dark;
+   the header strip (language label + copy button) sits on the light wrapper, untouched. */
 html.crx-active[data-mode="light"] pre.code-block__code {
   background-color: #2c2b28 !important;
 }
 
 /* ---------- user-chosen code-box background (Code box theme) ----------
-   When the user picks a colour it wins in EVERY mode (overrides the auto-dark above).
-   Cover the whole box, not just the code: the outer wrapper carries the language-label
-   header strip (a transparent label over the wrapper's own bg), so colour the wrapper
-   too — otherwise the header keeps Claude's grey while the body takes the custom colour. */
+   A picked colour wins in EVERY mode (overrides the auto-dark above). The :has() wrappers
+   cover the whole box: the outer wrapper carries the language-label header strip (transparent
+   label over the wrapper's bg), so it must be coloured too or the header keeps Claude's grey. */
 html.crx-active.crx-codebg pre.code-block__code,
 html.crx-active.crx-codebg div:has(> pre.code-block__code),
 html.crx-active.crx-codebg div:has(> div > pre.code-block__code) {

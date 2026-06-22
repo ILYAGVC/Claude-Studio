@@ -19,7 +19,7 @@ const CONTENT_JS = [
 const CONTENT_CSS = ["src/content/inject.css"];
 const CLAUDE_TABS = ["*://claude.ai/*", "*://*.claude.ai/*", "*://claude.com/*", "*://*.claude.com/*"];
 
-/* --- Default settings (tiny subset — only what the SW needs) --- */
+/* --- Default settings: only the subset the SW reads (full defaults live in defaults.js) --- */
 const FALLBACK = {
   enabled: true,
   allowRemoteFonts: true
@@ -66,16 +66,15 @@ async function updateCspRule(allow) {
 
 async function syncCspFromSettings() {
   const s = (await getSettings()) || FALLBACK;
-  // Only strip CSP when the extension is on and remote fonts are allowed.
+  // Strip CSP only when on AND remote fonts allowed; unset (undefined) counts as on.
   await updateCspRule(s.enabled !== false && s.allowRemoteFonts !== false);
 }
 
-/* --- Re-inject the content script + CSS into already-open Claude tabs ---
- * After an extension reload/update the content scripts in open tabs become
- * orphaned (they lose access to the extension APIs and stop reacting to
- * settings changes), and MV3 does NOT auto-inject the new version. We inject
- * it ourselves so the user does not have to refresh the page. The fresh
- * instance signals older ones to shut down (see content.js "crx:shutdown"). */
+/* --- Re-inject content script + CSS into already-open Claude tabs ---
+ * MV3 does NOT auto-inject the new version after a reload/update, leaving open
+ * tabs with orphaned scripts (no extension-API access, deaf to settings changes).
+ * Re-injecting avoids a manual refresh; the fresh instance tells older ones to
+ * shut down (see content.js "crx:shutdown"). */
 async function injectClaudeTabs() {
   let tabs;
   try {
@@ -85,7 +84,7 @@ async function injectClaudeTabs() {
   }
   for (const tab of tabs) {
     if (!tab.id) continue;
-    // Skip tabs that are still loading or discarded — they will inject via the manifest.
+    // Loading/discarded tabs will inject via the manifest on their own — skip to avoid a double inject.
     if (tab.discarded || tab.status === "loading") continue;
     try {
       await chrome.scripting.insertCSS({ target: { tabId: tab.id }, files: CONTENT_CSS });
