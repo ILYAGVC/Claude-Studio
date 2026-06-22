@@ -1,0 +1,21 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node (not used at runtime, but in case tooling is added)
+node_modules/
+npm-debug.log*
+
+# Build / packaging artifacts
+*.zip
+dist/
+build/
+web-ext-artifacts/
+
+# Temp / scratch
+*.tmp
+_*.js
+*.log

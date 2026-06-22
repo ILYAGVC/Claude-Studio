@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Hebrew:wght@400;600;700&display=swap" />
+  <link rel="stylesheet" href="popup.css" />
+  <!-- Apply the cached theme before first paint to avoid a theme flash on open. -->
+  <script src="theme-init.js"></script>
+</head>
+<body class="preload">
+  <div class="app">
+    <!-- ===== Header ===== -->
+    <header class="hdr">
+      <div class="hdr-brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22">
+            <path d="M16 5H4M16 12H4M16 19H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M21 9l-3 3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="hdr-titles">
+          <h1 data-i18n="brand">Claude Studio</h1>
+          <span class="hdr-sub" data-i18n="tagline">RTL, fonts &amp; themes for Claude</span>
+        </div>
+      </div>
+      <label class="master" title="روشن/خاموش" data-i18n-title="enable_title">
+        <input type="checkbox" id="enabled" />
+        <span class="switch"></span>
+        <span class="sr-only" data-i18n="enable_title">روشن/خاموش</span>
+      </label>
+    </header>
+
+    <!-- ===== Tabs ===== -->
+    <nav class="tabs" id="tabs">
+      <button class="tab is-active" data-tab="general" data-i18n="tab_general">عمومی</button>
+      <button class="tab" data-tab="fonts" data-i18n="tab_fonts">فونت</button>
+      <button class="tab" data-tab="type" data-i18n="tab_type">تایپوگرافی</button>
+      <button class="tab" data-tab="advanced" data-i18n="tab_advanced">پیشرفته</button>
+      <button class="tab" data-tab="about" data-i18n="tab_about">درباره</button>
+    </nav>
+
+    <main class="content">
+      <!-- ========== General ========== -->
+      <section class="panel is-active" data-panel="general">
+        <div class="field">
+          <label data-i18n="ui_lang">زبان رابط</label>
+          <div class="cselect" id="cs-lang"></div>
+        </div>
+
+        <div class="row">
+          <div class="row-label">
+            <span class="lbl" data-i18n="dir_label">جهت متن</span>
+            <span class="hint" data-i18n="dir_hint">حالت تشخیص خودکار برای متن‌های ترکیبی بهترین است.</span>
+          </div>
+          <div class="seg" id="rtlMode" data-field="rtlMode">
+            <button data-val="auto" data-i18n="dir_auto">خودکار</button>
+            <button data-val="rtl" data-i18n="dir_rtl">راست‌چین</button>
+            <button data-val="ltr" data-i18n="dir_ltr">چپ‌چین</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" data-i18n="apply_to">اعمال روی</div>
+          <label class="check"><input type="checkbox" id="scope_assistant" /><span data-i18n="sc_assistant">پاسخ‌های Claude</span></label>
+          <label class="check"><input type="checkbox" id="scope_user" /><span data-i18n="sc_user">پیام‌های شما</span></label>
+          <label class="check"><input type="checkbox" id="scope_input" /><span data-i18n="sc_input">کادر نوشتن</span></label>
+          <label class="check"><input type="checkbox" id="scope_chatList" /><span data-i18n="sc_chatlist">فهرست چت‌ها (نوار کناری)</span></label>
+        </div>
+
+        <div class="card">
+          <div class="card-title" data-i18n="claude_theme">تم خودِ Claude</div>
+          <div class="theme-row">
+            <span class="lbl" data-i18n="claude_mode">حالت روشن/تاریک</span>
+            <div class="seg" id="claudeTheme" data-field="claudeTheme">
+              <button data-val="auto" data-i18n="dir_auto">خودکار</button>
+              <button data-val="light" data-i18n="th_light">روشن</button>
+              <button data-val="dark" data-i18n="th_dark">تیره</button>
+              <button data-val="black" data-i18n="th_black">سیاه</button>
+            </div>
+          </div>
+          <div class="theme-block">
+            <span class="lbl" data-i18n="claude_accent_label">رنگ تأکید Claude (دلخواه)</span>
+            <div class="accent-row">
+              <input type="color" id="claudeAccent" class="accent-input" title="رنگ دلخواه" data-i18n-title="custom_color" />
+              <div class="accent-swatches" id="claudeAccentSwatches"></div>
+            </div>
+          </div>
+          <div class="theme-block">
+            <span class="lbl" id="codeBgLabel">Code box theme</span>
+            <div class="accent-row">
+              <input type="color" id="codeBg" class="accent-input" title="رنگ دلخواه" data-i18n-title="custom_color" />
+              <div class="accent-swatches" id="codeBgSwatches"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shortcuts">
+          <div class="card-title" data-i18n="sc_title">میانبرهای صفحه‌کلید</div>
+          <div class="shortcut-list" id="shortcutList">
+            <div class="shortcut-empty" data-i18n="sc_reading">در حال خواندن…</div>
+          </div>
+          <button class="btn btn-ghost full" id="editShortcuts" type="button">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span data-i18n="sc_customize">سفارشی‌سازی میانبرها</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ========== Font ========== -->
+      <section class="panel" data-panel="fonts">
+        <div class="field">
+          <label data-i18n="f_text">فونت متن</label>
+          <div class="cselect" id="cs-font"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="f_heading">فونت تیترها</label>
+          <div class="cselect" id="cs-headingFont"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="f_code">فونت کد</label>
+          <div class="cselect" id="cs-codeFont"></div>
+        </div>
+        <div class="slider" data-field="fontWeight">
+          <div class="slider-head"><span data-i18n="f_weight">ضخامت فونت</span><b id="fontWeight_v"></b></div>
+          <input type="range" id="fontWeight" min="0" max="900" step="100" />
+          <div class="slider-ticks" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="slider" data-field="codeFontWeight">
+          <div class="slider-head"><span id="codeWeightLabel">Code font weight</span><b id="codeFontWeight_v"></b></div>
+          <input type="range" id="codeFontWeight" min="0" max="900" step="100" />
+          <div class="slider-ticks" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== Typography ========== -->
+      <section class="panel" data-panel="type">
+        <div class="slider" data-field="fontSizePx">
+          <div class="slider-head"><span data-i18n="t_size">اندازه‌ی فونت</span><b id="fontSizePx_v"></b></div>
+          <input type="range" id="fontSizePx" min="12" max="30" step="1" />
+        </div>
+        <div class="slider" data-field="lineHeight">
+          <div class="slider-head"><span data-i18n="t_line">فاصله‌ی خطوط</span><b id="lineHeight_v"></b></div>
+          <input type="range" id="lineHeight" min="1.2" max="2.8" step="0.05" />
+        </div>
+        <div class="slider" data-field="letterSpacing">
+          <div class="slider-head"><span data-i18n="t_letter">فاصله‌ی حروف</span><b id="letterSpacing_v"></b></div>
+          <input type="range" id="letterSpacing" min="-1" max="3" step="0.1" />
+        </div>
+        <div class="slider" data-field="wordSpacing">
+          <div class="slider-head"><span data-i18n="t_word">فاصله‌ی کلمات</span><b id="wordSpacing_v"></b></div>
+          <input type="range" id="wordSpacing" min="0" max="10" step="0.5" />
+        </div>
+        <div class="slider" data-field="paragraphSpacing">
+          <div class="slider-head"><span data-i18n="t_para">فاصله‌ی پاراگراف‌ها</span><b id="paragraphSpacing_v"></b></div>
+          <input type="range" id="paragraphSpacing" min="0" max="1.5" step="0.05" />
+        </div>
+
+        <div class="row align-row">
+          <div class="row-label"><span class="lbl" data-i18n="t_align">ترازبندی</span></div>
+          <div class="seg" id="align" data-field="align">
+            <button data-val="start" data-i18n="a_start">خودکار</button>
+            <button data-val="right" data-i18n="a_right">راست</button>
+            <button data-val="center" data-i18n="a_center">وسط</button>
+            <button data-val="left" data-i18n="a_left">چپ</button>
+            <button data-val="justify" data-i18n="a_justify">هم‌تراز</button>
+          </div>
+        </div>
+
+        <label class="toggle-row" id="digitsRow">
+          <span><span class="lbl"><span data-i18n="t_digits">ارقام شرقی</span><span class="info-i" id="digitsInfo" data-i18n-title="t_digits_na" hidden>i</span></span><span class="hint" data-i18n="t_digits_hint">۱۲۳ به‌جای 123 در متن (نه در کد).</span></span>
+          <span class="switch sm"><input type="checkbox" id="persianDigits" /><i></i></span>
+        </label>
+
+        <label class="toggle-row">
+          <span><span class="lbl" data-i18n="t_rw">محدود کردن عرض متن</span><span class="hint" data-i18n="t_rw_hint">برای خوانایی بهتر در مانیتورهای عریض.</span></span>
+          <span class="switch sm"><input type="checkbox" id="readingWidthEnabled" /><i></i></span>
+        </label>
+        <div class="slider" data-field="readingWidth" id="readingWidthWrap">
+          <div class="slider-head"><span data-i18n="t_width">عرض متن</span><b id="readingWidth_v"></b></div>
+          <input type="range" id="readingWidth" min="560" max="1200" step="20" />
+        </div>
+      </section>
+
+      <!-- ========== Advanced ========== -->
+      <section class="panel" data-panel="advanced">
+        <label class="toggle-row">
+          <span><span class="lbl" data-i18n="adv_math">نمایش درست ریاضی</span><span class="hint" data-i18n="adv_math_hint">فرمول‌های KaTeX چپ‌چین و سالم بمانند.</span></span>
+          <span class="switch sm"><input type="checkbox" id="keepMathLtr" /><i></i></span>
+        </label>
+        <label class="toggle-row">
+          <span><span class="lbl" data-i18n="adv_code">کد همیشه چپ‌چین</span><span class="hint" data-i18n="adv_code_hint">بلوک‌های کد و کد درون‌خطی به‌هم نریزند.</span></span>
+          <span class="switch sm"><input type="checkbox" id="keepCodeLtr" /><i></i></span>
+        </label>
+        <label class="toggle-row">
+          <span><span class="lbl" id="remoteFontsLabel">Online fonts</span><span class="hint" id="remoteFontsHint">Load fonts from the internet (CDN).</span></span>
+          <span class="switch sm"><input type="checkbox" id="allowRemoteFonts" /><i></i></span>
+        </label>
+
+        <div class="card">
+          <div class="card-title" data-i18n="adv_presets">پیش‌تنظیم‌ها</div>
+          <div class="preset-add">
+            <input type="text" id="presetName" class="input" data-i18n-ph="preset_ph" placeholder="نام پیش‌تنظیم" />
+            <button class="btn" id="presetSave" data-i18n="save">ذخیره</button>
+          </div>
+          <div class="preset-list" id="presetList"></div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="adv_css">CSS سفارشی (پیشرفته)</label>
+          <textarea id="customCss" class="textarea" rows="4" data-i18n-ph="adv_css_ph" placeholder="/* قوانین CSS دلخواه شما */" spellcheck="false"></textarea>
+        </div>
+
+        <div class="field">
+          <label data-i18n="adv_theme">تم پنل</label>
+          <div class="seg" id="theme" data-field="theme">
+            <button data-val="system" data-i18n="th_system">سیستم</button>
+            <button data-val="light" data-i18n="th_light">روشن</button>
+            <button data-val="dark" data-i18n="th_dark">تیره</button>
+            <button data-val="black" data-i18n="th_black">سیاه</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="accent">رنگ تأکید</label>
+          <div class="accent-row">
+            <input type="color" id="accent" class="accent-input" title="رنگ دلخواه" data-i18n-title="custom_color" />
+            <div class="accent-swatches" id="accentSwatches"></div>
+          </div>
+        </div>
+
+        <div class="btn-grid">
+          <button class="btn" id="exportBtn" data-i18n="export_btn">برون‌بری تنظیمات</button>
+          <button class="btn" id="importBtn" data-i18n="import_btn">درون‌بری تنظیمات</button>
+          <button class="btn danger" id="resetBtn" data-i18n="reset_btn">بازنشانی همه</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json" hidden />
+      </section>
+
+      <!-- ========== About ========== -->
+      <section class="panel" data-panel="about">
+        <div class="about">
+          <div class="about-logo">
+            <svg viewBox="0 0 24 24" width="40" height="40">
+              <path d="M16 5H4M16 12H4M16 19H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M21 9l-3 3 3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <h2 data-i18n="brand">Claude Studio</h2>
+          <p class="ver"><span data-i18n="about_ver">نسخه</span> <span id="ver">1.13.43</span></p>
+          <p class="about-desc" data-i18n="about_desc">
+            راست‌چین‌سازی کامل گفتگوی Claude همراه با فونت‌های چندزبانه، تنظیمات تایپوگرافی حرفه‌ای، و نمایش درست ریاضی و کد.
+          </p>
+          <p class="made-by"><span data-i18n="made_by_1">ساخته شده با</span> <span class="heart">❤️</span> <span data-i18n="made_by_2">توسط</span> <a class="by-link" href="https://github.com/ILYAGVC" target="_blank" rel="noopener noreferrer">ILYAGVC</a></p>
+          <a class="repo-link" href="https://github.com/ILYAGVC/Claude-Studio" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+            <span>Claude-Studio</span>
+          </a>
+          <p class="disclaimer" data-i18n="disclaimer">Independent, unofficial extension — not affiliated with or endorsed by Anthropic. “Claude” is a trademark of Anthropic.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== Live Preview ===== -->
+    <section class="preview collapsed" id="previewWrap">
+      <div class="preview-resizer" id="previewResizer" title="برای تغییر ارتفاع بکشید" data-i18n-title="resize_title"><span></span></div>
+      <button class="preview-toggle" id="previewToggle">
+        <span data-i18n="prev_title">پیش‌نمایش زنده</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" class="chev"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="preview-body" id="previewBody">
+        <div class="prev-msg" id="prev">
+          <h4 class="prev-h">نمونه‌ی یک تیتر</h4>
+          <p>سلام! این یک <b>پیش‌نمایش زنده</b> از تنظیمات شماست. متن فارسی همراه با کمی English text و یک کد درون‌خطی مثل <code>const x = 42;</code> نمایش داده می‌شود.</p>
+          <p>اعداد نمونه: <span class="prev-digits">1402</span> و کمی English text در میانه‌ی متن.</p>
+          <p class="math">معادله: <span class="katex" dir="ltr">E = mc²</span> و انتگرال ∫ f(x) dx چپ‌چین می‌ماند.</p>
+          <pre dir="ltr"><code>function greet(name) {
+  return `سلام ${name}`;
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== Reset confirmation modal ===== -->
+  <div class="modal-overlay" id="resetModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3 class="modal-title" id="resetTitle" data-i18n="m_title">بازنشانی تنظیمات</h3>
+      <p class="modal-text" data-i18n="m_text">همه‌ی تنظیمات به حالت پیش‌فرض برمی‌گردند. این کار قابل بازگشت نیست. مطمئن هستید؟</p>
+      <div class="modal-actions">
+        <button class="btn" id="resetCancel" type="button" data-i18n="m_cancel">انصراف</button>
+        <button class="btn btn-danger-solid" id="resetConfirm" type="button" data-i18n="m_confirm">بله، بازنشانی کن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Confirm dialog (preset apply / delete) ===== -->
+  <div class="modal-overlay" id="confirmModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" width="26" height="26"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3 class="modal-title" id="confirmTitle"></h3>
+      <p class="modal-text" id="confirmText"></p>
+      <div class="modal-actions">
+        <button class="btn" id="confirmCancel" type="button" data-i18n="m_cancel">انصراف</button>
+        <button class="btn" id="confirmOk" type="button"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../lib/i18n.js"></script>
+  <script src="../lib/defaults.js"></script>
+  <script src="../lib/fonts.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

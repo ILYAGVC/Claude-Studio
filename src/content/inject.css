@@ -1,0 +1,211 @@
+/* ===================================================================
+ *  Claude RTL — styles injected into the Claude page
+ *  Everything is gated behind the html.crx-* classes so that nothing
+ *  is changed while the extension is turned off.
+ *
+ *  Region selectors (matching Claude's current structure):
+ *    Claude response : .font-claude-response / .font-claude-response-body
+ *    User message    : [data-testid="user-message"] / .!font-user-message
+ *    Compose box     : .ProseMirror
+ *  (Old classes are kept for backward compatibility)
+ * =================================================================== */
+
+:root {
+  --crx-font: inherit;
+  --crx-headfont: var(--crx-font);
+  --crx-codefont: inherit;
+  --crx-size: 16px;
+  --crx-lh: 1.9;
+  --crx-ls: 0px;
+  --crx-ws: 0px;
+  --crx-pspace: 0.2em;
+  --crx-align: start;
+  --crx-weight: inherit;
+  --crx-codeweight: inherit;
+  --crx-width: 820px;
+}
+
+/* ---------- line-height + spacing + alignment (always-on: extension-owned) ---------- */
+html.crx-active.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose),
+html.crx-active.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose) :is(p, li, ul, ol, blockquote, dd, dt, td, th, summary, figcaption, h1, h2, h3, h4, h5, h6),
+html.crx-active.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message),
+html.crx-active.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(p, li, ul, ol, blockquote, dd, dt, td, th, summary, figcaption, h1, h2, h3, h4, h5, h6) {
+  line-height: var(--crx-lh) !important;
+  letter-spacing: var(--crx-ls) !important;
+  word-spacing: var(--crx-ws) !important;
+  text-align: var(--crx-align) !important;
+}
+
+/* ---------- body font-family (gated: default font leaves Claude's own font untouched) ---------- */
+html.crx-active.crx-font.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose),
+html.crx-active.crx-font.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose) :is(p, li, ul, ol, blockquote, dd, dt, td, th, summary, figcaption, h1, h2, h3, h4, h5, h6),
+html.crx-active.crx-font.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message),
+html.crx-active.crx-font.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(p, li, ul, ol, blockquote, dd, dt, td, th, summary, figcaption, h1, h2, h3, h4, h5, h6) {
+  font-family: var(--crx-font) !important;
+}
+
+/* ---------- heading font (can be separate; gated so default headings keep Claude's serif) ---------- */
+html.crx-active.crx-headfont.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(h1, h2, h3, h4, h5, h6),
+html.crx-active.crx-headfont.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--crx-headfont) !important;
+}
+
+/* heading weight follows the chosen body weight, but only when a non-default weight
+   is set — applying the default (inherit) would strip Claude's heading boldness */
+html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(h1, h2, h3, h4, h5, h6),
+html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(h1, h2, h3, h4, h5, h6) {
+  font-weight: var(--crx-weight) !important;
+}
+
+/* ---------- size on body text (always-on: extension-owned) ---------- */
+html.crx-active.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption),
+html.crx-active.crx-asst :is(p.font-claude-response-body),
+html.crx-active.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption) {
+  font-size: var(--crx-size) !important;
+}
+
+/* ---------- weight on body text (gated: default weight leaves Claude's own weight, e.g. bold th/dt) ---------- */
+html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption),
+html.crx-active.crx-weight.crx-asst :is(p.font-claude-response-body),
+html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption) {
+  font-weight: var(--crx-weight) !important;
+}
+
+/* ---------- variable-font weight: force the "wght" axis too ----------
+   For a VARIABLE font, font-variation-settings "wght" overrides the font-weight
+   property for glyph rendering. Claude sets font-variation-settings:"wght" ~360 on
+   [data-cds-anim], so without this the chosen weight never renders for variable fonts
+   (e.g. Vazirmatn). Gated by crx-weight so the default value (inherit) — which is
+   invalid inside font-variation-settings — never reaches this property. Setting
+   "wght" N is harmless for static fonts (no wght axis -> ignored). */
+html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-response-body, .font-claude-message, [data-testid="assistant-message"], .prose) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption),
+html.crx-active.crx-weight.crx-asst :is(p.font-claude-response-body),
+html.crx-active.crx-weight.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(h1, h2, h3, h4, h5, h6),
+html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(p, li, blockquote, dd, dt, td, th, summary, figcaption),
+html.crx-active.crx-weight.crx-user :is([data-testid="user-message"], [class~="!font-user-message"], .font-user-message) :is(h1, h2, h3, h4, h5, h6) {
+  font-variation-settings: "wght" var(--crx-weight) !important;
+  /* "wght"-only above replaces Claude's whole declaration (incl. its "opsz"); let the
+     optical-size axis fall back to automatic size-driven sizing instead of the font default. */
+  font-optical-sizing: auto !important;
+}
+
+/* ---------- spacing between paragraphs ---------- */
+html.crx-active.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) p {
+  margin-bottom: calc(0.55em + var(--crx-pspace)) !important;
+}
+
+/* ---------- fix Claude's asymmetric padding for RTL ----------
+   Claude gives the response text padding-left:8px and padding-right:32px (for LTR).
+   With logical padding, these values automatically flip with the direction so they stay symmetric in RTL too. */
+html.crx-active.crx-asst :is(.standard-markdown, .progressive-markdown) :is(p, blockquote, h1, h2, h3, h4, h5, h6) {
+  padding-inline-start: 0.5rem !important;
+  padding-inline-end: 2rem !important;
+}
+
+/* ---------- chat list in the sidebar ---------- */
+html.crx-active.crx-chatlist :is(a[href*="/chat/"], a[href*="/project/"]),
+html.crx-active.crx-chatlist :is(a[href*="/chat/"], a[href*="/project/"]) :is(span, div) {
+  text-align: start !important;
+}
+/* chat-list font-family gated so the default font leaves Claude's own untouched */
+html.crx-active.crx-font.crx-chatlist :is(a[href*="/chat/"], a[href*="/project/"]),
+html.crx-active.crx-font.crx-chatlist :is(a[href*="/chat/"], a[href*="/project/"]) :is(span, div) {
+  font-family: var(--crx-font) !important;
+}
+
+/* ---------- compose box (ProseMirror) ---------- */
+html.crx-active.crx-input .ProseMirror,
+html.crx-active.crx-input .ProseMirror :is(p, li, ul, ol, blockquote) {
+  font-size: var(--crx-size) !important;
+  line-height: var(--crx-lh) !important;
+  letter-spacing: var(--crx-ls) !important;
+  word-spacing: var(--crx-ws) !important;
+  text-align: start !important;
+}
+/* composer font-family / weight gated so defaults leave Claude's composer untouched */
+html.crx-active.crx-font.crx-input .ProseMirror,
+html.crx-active.crx-font.crx-input .ProseMirror :is(p, li, ul, ol, blockquote) {
+  font-family: var(--crx-font) !important;
+}
+html.crx-active.crx-weight.crx-input .ProseMirror,
+html.crx-active.crx-weight.crx-input .ProseMirror :is(p, li, ul, ol, blockquote) {
+  font-weight: var(--crx-weight) !important;
+}
+
+/* composer: force the "wght" axis for variable fonts (gated by crx-weight so
+   the default "inherit" never reaches font-variation-settings) */
+html.crx-active.crx-weight.crx-input .ProseMirror,
+html.crx-active.crx-weight.crx-input .ProseMirror :is(p, li, ul, ol, blockquote) {
+  font-variation-settings: "wght" var(--crx-weight) !important;
+  font-optical-sizing: auto !important;
+}
+
+/* ---------- code font (when enabled) ----------
+   Reset font-feature-settings too: Claude bakes "calt" 0, "liga" 0 onto code, which would
+   kill the ligatures that are the whole point of fonts like Fira Code / JetBrains Mono.
+   Gated by crx-codefont so the default (Claude's own mono) keeps Claude's settings. */
+html.crx-active.crx-codefont :is(pre, pre *, code, kbd, samp) {
+  font-family: var(--crx-codefont) !important;
+  font-feature-settings: normal !important;
+  font-variant-ligatures: normal !important;
+}
+
+/* ---------- code font weight (independent of the code-font choice) ---------- */
+html.crx-active.crx-codeweight :is(pre, pre *, code, kbd, samp) {
+  font-weight: var(--crx-codeweight) !important;
+}
+
+/* code: force the "wght" axis for variable mono fonts (gated by crx-codeweight so
+   the default "inherit" never reaches font-variation-settings) */
+html.crx-active.crx-codeweight :is(pre, pre *, code, kbd, samp) {
+  font-variation-settings: "wght" var(--crx-codeweight) !important;
+  font-optical-sizing: auto !important;
+}
+
+/* ---------- light-mode code-block readability ----------
+   Claude bakes code-block syntax colours light (designed for an always-dark block), but in
+   light mode the block background follows the theme to white and the highlighting washes
+   out (light text on white). Pin the code area dark so the syntax stays readable; the header
+   strip (language label + copy button) sits on the light wrapper and is left untouched. */
+html.crx-active[data-mode="light"] pre.code-block__code {
+  background-color: #2c2b28 !important;
+}
+
+/* ---------- user-chosen code-box background (Code box theme) ----------
+   When the user picks a colour it wins in EVERY mode (overrides the auto-dark above).
+   Cover the whole box, not just the code: the outer wrapper carries the language-label
+   header strip (a transparent label over the wrapper's own bg), so colour the wrapper
+   too — otherwise the header keeps Claude's grey while the body takes the custom colour. */
+html.crx-active.crx-codebg pre.code-block__code,
+html.crx-active.crx-codebg div:has(> pre.code-block__code),
+html.crx-active.crx-codebg div:has(> div > pre.code-block__code) {
+  background-color: var(--crx-codebg) !important;
+}
+
+/* ---------- keep code left-aligned (LTR) ---------- */
+html.crx-active.crx-codeltr :is(pre, pre *, code, kbd, samp) {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  text-align: left !important;
+}
+
+/* ---------- keep math (KaTeX/MathML) left-aligned (LTR) ---------- */
+html.crx-active.crx-mathltr :is(.katex, .katex *, .katex-display, .katex-mathml, mjx-container, mjx-container *, math) {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+}
+html.crx-active.crx-mathltr .katex-display {
+  text-align: center !important;
+}
+
+/* ---------- reading width ---------- */
+html.crx-active.crx-rw :is(.font-claude-response, .font-claude-message, [data-testid="user-message"]) {
+  max-width: var(--crx-width) !important;
+  margin-inline: auto !important;
+}
+
+/* ---------- minor fixes for RTL lists ---------- */
+html.crx-active.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(ul, ol)[dir="rtl"],
+html.crx-active.crx-asst :is(.font-claude-response, .font-claude-message, [data-testid="assistant-message"], .prose) :is(ul, ol)[dir="auto"] {
+  padding-inline-start: 1.4em;
+}

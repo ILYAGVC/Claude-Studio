@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "Claude Studio — RTL, Fonts & Themes",
+  "short_name": "Claude Studio",
+  "version": "1.13.43",
+  "description": "RTL & multilingual support for Claude: 50+ fonts, pro typography, light/dark/black themes, accent colors, and correct math & code.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "Claude Studio",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/popup/popup.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background/sw.js"
+  },
+  "permissions": [
+    "storage",
+    "declarativeNetRequestWithHostAccess",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://claude.ai/*",
+    "*://*.claude.ai/*",
+    "*://claude.com/*",
+    "*://*.claude.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://claude.ai/*",
+        "*://*.claude.ai/*",
+        "*://claude.com/*",
+        "*://*.claude.com/*"
+      ],
+      "js": [
+        "src/lib/defaults.js",
+        "src/lib/fonts.js",
+        "src/content/content.js"
+      ],
+      "css": [
+        "src/content/inject.css"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "commands": {
+    "toggle-rtl": {
+      "description": "Turn the extension on/off"
+    },
+    "_execute_action": {}
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net"
+  }
+}
