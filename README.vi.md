@@ -21,7 +21,7 @@ Một tiện ích mở rộng trình duyệt Manifest V3 giúp ứng dụng web 
 - **Hơn 50 phông chữ, nhóm theo hệ chữ viết** — Ba Tư, Ả Rập, Do Thái, Urdu, Latinh,
   Cyrillic, Devanagari, Nhật, Trung, Hàn, Thái, Bengali — với bộ chọn có thể tìm kiếm,
   xem trước và các nhãn lọc theo từng ngôn ngữ. Phông chữ riêng cho
-  nội dung, tiêu đề và mã — mỗi loại là một phông chữ web có thể tải xuống (Google Fonts / jsDelivr).
+  nội dung, tiêu đề và mã — mỗi loại là một phông chữ web có thể tải xuống (Google Fonts).
 - **Kiểu chữ** — cỡ chữ, độ đậm, chiều cao dòng, khoảng cách chữ/từ/đoạn,
   và giới hạn chiều rộng đọc, tất cả đều có thanh trượt điều chỉnh trực tiếp.
 - **Chữ số bản địa** — hiển thị số bằng chữ số riêng của ngôn ngữ bạn (Ba Tư,
@@ -56,7 +56,7 @@ Có thể gán phím tắt tại `chrome://extensions/shortcuts` (mặc định 
 
 Tiện ích **không thu thập dữ liệu** — không phân tích, không đo từ xa, không theo dõi.
 Cài đặt chỉ được lưu trong `chrome.storage.local` trên thiết bị của bạn. Các yêu cầu
-mạng duy nhất là **tệp phông chữ** được tải từ Google Fonts / jsDelivr khi bạn
+mạng duy nhất là **tệp phông chữ** được tải từ Google Fonts khi bạn
 chọn một phông chữ có thể tải xuống. Xem [PRIVACY.md](PRIVACY.md) để biết chi tiết.
 
 ---
@@ -78,7 +78,7 @@ chọn một phông chữ có thể tải xuống. Xem [PRIVACY.md](PRIVACY.md) 
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

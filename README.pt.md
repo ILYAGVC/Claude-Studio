@@ -21,7 +21,7 @@ Uma extensão de navegador Manifest V3 que torna o aplicativo web do **Claude** 
 - **Mais de 50 fontes, agrupadas por escrita** — persa, árabe, hebraico, urdu, latim,
   cirílico, devanágari, japonês, chinês, coreano, tailandês, bengali — com um
   seletor pesquisável com pré-visualização e chips de filtro por idioma. Fontes separadas para
-  o corpo do texto, títulos e código — cada uma uma fonte web descarregável (Google Fonts / jsDelivr).
+  o corpo do texto, títulos e código — cada uma uma fonte web descarregável (Google Fonts).
 - **Tipografia** — tamanho da fonte, peso, altura da linha, espaçamento entre letras/palavras/parágrafos
   e um limite de largura de leitura, tudo com controles deslizantes em tempo real.
 - **Numerais locais** — mostre os números nos dígitos do seu próprio idioma (persa,
@@ -56,7 +56,7 @@ definido por padrão).
 
 A extensão **não coleta nenhum dado** — sem análises, sem telemetria, sem rastreamento.
 As configurações são armazenadas apenas em `chrome.storage.local` no seu dispositivo. As únicas
-solicitações de rede são **arquivos de fontes** obtidos do Google Fonts / jsDelivr quando você
+solicitações de rede são **arquivos de fontes** obtidos do Google Fonts quando você
 seleciona uma fonte descarregável. Consulte [PRIVACY.md](PRIVACY.md) para detalhes.
 
 ---
@@ -78,7 +78,7 @@ seleciona uma fonte descarregável. Consulte [PRIVACY.md](PRIVACY.md) para detal
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

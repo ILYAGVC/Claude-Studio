@@ -21,7 +21,7 @@ Un'estensione per browser Manifest V3 che rende l'app web di **Claude** (`claude
 - **Oltre 50 font, raggruppati per scrittura** — persiano, arabo, ebraico, urdu, latino,
   cirillico, devanagari, giapponese, cinese, coreano, thailandese, bengalese — con un
   selettore ricercabile e con anteprima e chip di filtro per lingua. Font separati per
-  corpo del testo, intestazioni e codice — ciascuno un font web scaricabile (Google Fonts / jsDelivr).
+  corpo del testo, intestazioni e codice — ciascuno un font web scaricabile (Google Fonts).
 - **Tipografia** — dimensione del font, spessore, altezza della riga, spaziatura tra lettere/parole/paragrafi
   e un limite di larghezza di lettura, tutti con cursori in tempo reale.
 - **Numeri locali** — mostra i numeri con le cifre proprie della tua lingua (persiano,
@@ -56,7 +56,7 @@ ne è impostata nessuna).
 
 L'estensione **non raccoglie alcun dato** — niente analitiche, niente telemetria, niente tracciamento.
 Le impostazioni vengono memorizzate solo in `chrome.storage.local` sul tuo dispositivo. Le uniche
-richieste di rete sono i **file dei font** scaricati da Google Fonts / jsDelivr quando
+richieste di rete sono i **file dei font** scaricati da Google Fonts quando
 selezioni un font scaricabile. Per i dettagli vedi [PRIVACY.md](PRIVACY.md).
 
 ---
@@ -78,7 +78,7 @@ selezioni un font scaricabile. Per i dettagli vedi [PRIVACY.md](PRIVACY.md).
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

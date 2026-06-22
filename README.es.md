@@ -21,7 +21,7 @@ Una extensión de navegador con Manifest V3 que vuelve la aplicación web de **C
 - **Más de 50 fuentes, agrupadas por sistema de escritura** — persa, árabe, hebreo, urdu, latino,
   cirílico, devanagari, japonés, chino, coreano, tailandés, bengalí, con un
   selector que permite buscar y previsualizar, y chips de filtro por idioma. Fuentes separadas para
-  el cuerpo, los títulos y el código, cada una una fuente web descargable (Google Fonts / jsDelivr).
+  el cuerpo, los títulos y el código, cada una una fuente web descargable (Google Fonts).
 - **Tipografía** — tamaño de fuente, grosor, altura de línea, espaciado entre letras, palabras y párrafos,
   y un límite de ancho de lectura, todo con controles deslizantes en tiempo real.
 - **Numerales locales** — muestra los números con los dígitos propios de tu idioma (persa,
@@ -56,7 +56,7 @@ configurado de forma predeterminada).
 
 La extensión **no recopila ningún dato**: sin analíticas, sin telemetría, sin seguimiento.
 Los ajustes se guardan únicamente en `chrome.storage.local` en tu dispositivo. Las únicas
-solicitudes de red son los **archivos de fuentes** descargados de Google Fonts / jsDelivr cuando
+solicitudes de red son los **archivos de fuentes** descargados de Google Fonts cuando
 seleccionas una fuente descargable. Consulta [PRIVACY.md](PRIVACY.md) para más detalles.
 
 ---
@@ -78,7 +78,7 @@ seleccionas una fuente descargable. Consulta [PRIVACY.md](PRIVACY.md) para más 
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

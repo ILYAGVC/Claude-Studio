@@ -22,7 +22,7 @@ Eine Manifest-V3-Browser-Erweiterung, die die **Claude**-Web-App (`claude.ai` /
 - **Mehr als 50 Schriften, nach Schriftsystem gruppiert** — Persisch, Arabisch, Hebräisch, Urdu, Lateinisch,
   Kyrillisch, Devanagari, Japanisch, Chinesisch, Koreanisch, Thai, Bengali — mit einer
   durchsuchbaren Auswahl mit Vorschau und Filter-Chips pro Sprache. Separate Schriften für
-  Fließtext, Überschriften und Code — jeweils eine herunterladbare Web-Schrift (Google Fonts / jsDelivr).
+  Fließtext, Überschriften und Code — jeweils eine herunterladbare Web-Schrift (Google Fonts).
 - **Typografie** — Schriftgröße, Schriftstärke, Zeilenhöhe, Zeichen-/Wort-/Absatzabstand
   und eine Begrenzung der Lesebreite, alles mit Live-Schiebereglern.
 - **Lokale Ziffern** — zeige Zahlen in den eigenen Ziffern deiner Sprache (Persisch,
@@ -57,7 +57,7 @@ keine festgelegt).
 
 Die Erweiterung **sammelt keine Daten** — keine Analyse, keine Telemetrie, kein Tracking.
 Die Einstellungen werden ausschließlich in `chrome.storage.local` auf deinem Gerät gespeichert. Die einzigen
-Netzwerkanfragen sind **Schriftdateien**, die von Google Fonts / jsDelivr abgerufen werden, wenn du
+Netzwerkanfragen sind **Schriftdateien**, die von Google Fonts abgerufen werden, wenn du
 eine herunterladbare Schrift auswählst. Weitere Einzelheiten findest du in [PRIVACY.md](PRIVACY.md).
 
 ---
@@ -79,7 +79,7 @@ eine herunterladbare Schrift auswählst. Weitere Einzelheiten findest du in [PRI
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

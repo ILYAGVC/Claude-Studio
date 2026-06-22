@@ -2,16 +2,12 @@
  *  Claude RTL — font catalog (grouped by language)
  *  Each font: { id, label, stack, group (language), load }
  *  load = null → system/default font (no network load)
- *  load.type = 'google' → Google Fonts   |   'css' → @font-face from jsDelivr
+ *  load.type = 'google' → Google Fonts
  * =================================================================== */
 (function () {
   "use strict";
 
   const G = (family, axis) => ({ type: "google", family: family, axis: axis || "" });
-  // weights = the static weights the jsDelivr @font-face.css actually ships, so the
-  // slider offers exactly those and never a weight the font lacks (no synthetic bold).
-  const J = (url, weights) => ({ type: "css", url: url, weights: weights || null });
-  const JD = "https://cdn.jsdelivr.net/gh/rastikerdar/";
 
   function href(load) {
     if (!load) return null;
@@ -23,7 +19,7 @@
         "&display=swap"
       );
     }
-    return load.url;
+    return null;
   }
 
   /* Group names written in each language's own script */
@@ -44,16 +40,12 @@
   const text = [
     { id: "default", group: null, label: "پیش‌فرض Claude", stack: "inherit", load: null },
 
-    /* ===== Persian ===== */
-    { id: "Vazirmatn", group: FA, label: "وزیرمتن — Vazirmatn", stack: "'Vazirmatn','Vazir',Tahoma,sans-serif", load: G("Vazirmatn", "100..900") },
-    { id: "Vazir",     group: FA, label: "وزیر — Vazir",        stack: "'Vazir',Tahoma,sans-serif",            load: J(JD + "vazir-font@latest/dist/font-face.css", [100, 300, 400, 500, 700, 900]) },
-    { id: "Sahel",     group: FA, label: "ساحل — Sahel",        stack: "'Sahel',Tahoma,sans-serif",            load: J(JD + "sahel-font@latest/dist/font-face.css", [300, 400, 600, 700, 900]) },
-    { id: "Samim",     group: FA, label: "صمیم — Samim",        stack: "'Samim',Tahoma,sans-serif",            load: J(JD + "samim-font@latest/dist/font-face.css", [400, 500, 700]) },
-    { id: "Shabnam",   group: FA, label: "شبنم — Shabnam",      stack: "'Shabnam',Tahoma,sans-serif",          load: J(JD + "shabnam-font@latest/dist/font-face.css", [100, 300, 400, 500, 700]) },
-    { id: "Gandom",    group: FA, label: "گندم — Gandom",       stack: "'Gandom',Tahoma,sans-serif",           load: J(JD + "gandom-font@latest/dist/font-face.css", [400]) },
-    { id: "Tanha",     group: FA, label: "تنها — Tanha",        stack: "'Tanha',Tahoma,serif",                 load: J(JD + "tanha-font@latest/dist/font-face.css", [400]) },
-    { id: "Parastoo",  group: FA, label: "پرستو — Parastoo",    stack: "'Parastoo',Tahoma,sans-serif",         load: J(JD + "parastoo-font@latest/dist/font-face.css", [400, 700]) },
-    { id: "Lalezar",   group: FA, label: "لاله‌زار — Lalezar", stack: "'Lalezar',cursive",            load: G("Lalezar") },
+    /* ===== Persian (Google Fonts only) ===== */
+    { id: "Vazirmatn", group: FA, label: "وزیرمتن — Vazirmatn", stack: "'Vazirmatn',Tahoma,sans-serif", load: G("Vazirmatn", "100..900") },
+    { id: "Estedad",   group: FA, label: "استعداد — Estedad",  stack: "'Estedad',Tahoma,sans-serif",   load: G("Estedad", "100..900") },
+    { id: "Parastoo",  group: FA, label: "پرستو — Parastoo",   stack: "'Parastoo',Tahoma,sans-serif",  load: G("Parastoo", "400;700") },
+    { id: "Lemonada",  group: FA, label: "لیموناد — Lemonada", stack: "'Lemonada',Tahoma,cursive",     load: G("Lemonada", "300..700") },
+    { id: "Lalezar",   group: FA, label: "لاله‌زار — Lalezar", stack: "'Lalezar',cursive",             load: G("Lalezar") },
 
     /* ===== Arabic ===== */
     { id: "NotoNaskh",      group: AR, label: "نسخ — Noto Naskh Arabic",   stack: "'Noto Naskh Arabic',serif",            load: G("Noto Naskh Arabic", "400..700") },
@@ -175,7 +167,6 @@
     weightStops: function (f) {
       if (!f || !f.load) return null; // system/inherit/default: unknown
       const L = f.load;
-      if (L.type === "css") return L.weights && L.weights.length ? L.weights.slice() : [400];
       if (L.type === "google") {
         const ax = L.axis || "";
         if (!ax) return [400]; // single static weight

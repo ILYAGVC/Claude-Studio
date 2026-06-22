@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_appName__",
   "short_name": "Claude Studio",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "__MSG_appDesc__",
   "default_locale": "en",
   "icons": {
@@ -30,7 +30,6 @@
   },
   "permissions": [
     "storage",
-    "declarativeNetRequestWithHostAccess",
     "scripting"
   ],
   "host_permissions": [
@@ -66,6 +65,6 @@
     "_execute_action": {}
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net"
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fonts.googleapis.com"
   }
 }

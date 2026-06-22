@@ -21,7 +21,7 @@ Ekstensi peramban Manifest V3 yang membuat aplikasi web **Claude** (`claude.ai` 
 - **50+ font, dikelompokkan berdasarkan aksara** — Persia, Arab, Ibrani, Urdu, Latin,
   Sirilik, Devanagari, Jepang, Tionghoa, Korea, Thai, Bengali — dengan pemilih yang
   dapat dicari dan menampilkan pratinjau serta cip filter per‑bahasa. Font terpisah untuk
-  isi teks, judul, dan kode — masing‑masing font web yang dapat diunduh (Google Fonts / jsDelivr).
+  isi teks, judul, dan kode — masing‑masing font web yang dapat diunduh (Google Fonts).
 - **Tipografi** — ukuran font, ketebalan, tinggi baris, jarak huruf/kata/paragraf,
   serta batas lebar baca, semuanya dengan penggeser langsung.
 - **Angka lokal** — tampilkan angka dalam digit bahasa Anda sendiri (Persia,
@@ -56,7 +56,7 @@ yang diatur secara bawaan).
 
 Ekstensi ini **tidak mengumpulkan data apa pun** — tanpa analitik, tanpa telemetri, tanpa pelacakan.
 Pengaturan hanya disimpan di `chrome.storage.local` pada perangkat Anda. Satu‑satunya
-permintaan jaringan adalah **berkas font** yang diambil dari Google Fonts / jsDelivr saat Anda
+permintaan jaringan adalah **berkas font** yang diambil dari Google Fonts saat Anda
 memilih font yang dapat diunduh. Lihat [PRIVACY.md](PRIVACY.md) untuk detailnya.
 
 ---
@@ -78,7 +78,7 @@ memilih font yang dapat diunduh. Lihat [PRIVACY.md](PRIVACY.md) untuk detailnya.
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

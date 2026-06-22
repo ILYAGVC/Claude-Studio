@@ -21,7 +21,7 @@ Rozszerzenie przeglądarki w standardzie Manifest V3, które sprawia, że aplika
 - **Ponad 50 czcionek pogrupowanych według pisma** — perska, arabska, hebrajska, urdu, łacińska,
   cyrylica, dewanagari, japońska, chińska, koreańska, tajska, bengalska — z możliwością
   przeszukiwania, podglądem i filtrowaniem za pomocą etykiet dla poszczególnych języków. Osobne czcionki dla
-  tekstu, nagłówków i kodu — każda to czcionka internetowa do pobrania (Google Fonts / jsDelivr).
+  tekstu, nagłówków i kodu — każda to czcionka internetowa do pobrania (Google Fonts).
 - **Typografia** — rozmiar czcionki, grubość, wysokość wiersza, odstępy między literami/słowami/akapitami
   oraz limit szerokości tekstu do czytania, wszystko z suwakami działającymi na żywo.
 - **Lokalne cyfry** — wyświetlaj liczby w cyfrach właściwych dla Twojego języka (perskie,
@@ -56,7 +56,7 @@ ustawione).
 
 Rozszerzenie **nie gromadzi żadnych danych** — żadnej analityki, telemetrii ani śledzenia.
 Ustawienia są przechowywane wyłącznie w `chrome.storage.local` na Twoim urządzeniu. Jedyne
-żądania sieciowe to **pliki czcionek** pobierane z Google Fonts / jsDelivr, gdy
+żądania sieciowe to **pliki czcionek** pobierane z Google Fonts, gdy
 wybierzesz czcionkę do pobrania. Szczegóły znajdziesz w [PRIVACY.md](PRIVACY.md).
 
 ---
@@ -78,7 +78,7 @@ wybierzesz czcionkę do pobrania. Szczegóły znajdziesz w [PRIVACY.md](PRIVACY.
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

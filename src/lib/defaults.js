@@ -50,7 +50,7 @@
   };
 
   const DEFAULTS = {
-    version: 2,
+    version: 3,
 
     /* --- General --- */
     enabled: true,
@@ -143,6 +143,15 @@
       // (follows direction) so it works in all of LTR/RTL/auto.
       if (!saved || saved.align === "right" || saved.align == null) out.align = "start";
     }
+    if (sv < 3) {
+      // v3: the jsDelivr-hosted Persian fonts (Vazir, Sahel, Samim, Shabnam, Gandom,
+      // Tanha) were dropped in favor of Google Fonts (no more CSP workaround). Remap a
+      // stored selection of any removed font to Vazirmatn, the modern Google
+      // equivalent. Parastoo survived (now served from Google), so it is left as-is.
+      const GONE = { Vazir: 1, Sahel: 1, Samim: 1, Shabnam: 1, Gandom: 1, Tanha: 1 };
+      if (GONE[out.font]) out.font = "Vazirmatn";
+      if (GONE[out.headingFont]) out.headingFont = "Vazirmatn";
+    }
     // --- Clamp/validate so imported or corrupted values never reach the page out of range ---
     const num = (v, min, max, def) => {
       if (v === null || v === "" || typeof v === "boolean" || Array.isArray(v)) return def;
@@ -177,12 +186,12 @@
     else out.customCss = out.customCss.slice(0, 20000)
       .replace(/@import\b[^;{}\n]*;?/gi, "")
       .replace(/url\((['"]?)([^)'"]*)\1\)/gi, function (m, q, u) {
-        return /^(data:|https:\/\/(fonts\.gstatic\.com|fonts\.googleapis\.com|cdn\.jsdelivr\.net)\/)/i.test(String(u).trim()) ? m : "none";
+        return /^(data:|https:\/\/(fonts\.gstatic\.com|fonts\.googleapis\.com)\/)/i.test(String(u).trim()) ? m : "none";
       })
       // Catch-all: a url()-only filter misses image-set(), bare src, etc., so
       // host-whitelist every remaining absolute URL and blank out off-CDN ones.
       .replace(/(?:https?:)?\/\/[^\s'")]+/gi, function (u) {
-        return /^https:\/\/(fonts\.gstatic\.com|fonts\.googleapis\.com|cdn\.jsdelivr\.net)\//i.test(u) ? u : "about:blank";
+        return /^https:\/\/(fonts\.gstatic\.com|fonts\.googleapis\.com)\//i.test(u) ? u : "about:blank";
       });
     // Coerce nested scope/sites flags to real booleans: a stray "no"/"0" reads as
     // truthy under "!== false" and would silently flip a disabled toggle back on.

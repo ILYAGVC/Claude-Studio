@@ -24,7 +24,7 @@ het thema volledig aan te passen.
   Urdu, Latijns, Cyrillisch, Devanagari, Japans, Chinees, Koreaans, Thais,
   Bengaals — met een doorzoekbare kiezer met voorbeeldweergave en filterchips per
   taal. Aparte lettertypen voor tekst, koppen en code — elk een downloadbaar
-  weblettertype (Google Fonts / jsDelivr).
+  weblettertype (Google Fonts).
 - **Typografie** — lettergrootte, dikte, regelhoogte, letter-/woord-/
   alinea-afstand en een leesbreedtelimiet, allemaal met live schuifregelaars.
 - **Lokale cijfers** — toon getallen in de eigen cijfers van je taal (Perzisch,
@@ -61,7 +61,7 @@ er standaard geen ingesteld).
 De extensie **verzamelt geen gegevens** — geen analyses, geen telemetrie, geen
 tracking. Instellingen worden alleen opgeslagen in `chrome.storage.local` op je
 apparaat. De enige netwerkverzoeken zijn **lettertypebestanden** die van Google
-Fonts / jsDelivr worden opgehaald wanneer je een downloadbaar lettertype kiest.
+Fonts worden opgehaald wanneer je een downloadbaar lettertype kiest.
 Zie [PRIVACY.md](PRIVACY.md) voor meer informatie.
 
 ---
@@ -83,7 +83,7 @@ Zie [PRIVACY.md](PRIVACY.md) voor meer informatie.
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

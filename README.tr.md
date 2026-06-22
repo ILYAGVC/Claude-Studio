@@ -25,7 +25,7 @@ tarayıcı uzantısı.
   İbranice, Urduca, Latin, Kiril, Devanagari, Japonca, Çince, Korece, Tayca,
   Bengalce — aranabilir, önizlemeli bir seçici ve dile özel filtre etiketleriyle
   birlikte. Metin gövdesi, başlıklar ve kod için ayrı yazı tipleri — her biri
-  indirilebilir bir web yazı tipi (Google Fonts / jsDelivr).
+  indirilebilir bir web yazı tipi (Google Fonts).
 - **Tipografi** — yazı tipi boyutu, kalınlığı, satır yüksekliği, harf/kelime/paragraf
   aralığı ve okuma genişliği sınırı; hepsi canlı kaydırıcılarla.
 - **Yerel rakamlar** — sayıları kendi dilinizin rakamlarıyla gösterin (Farsça,
@@ -60,7 +60,7 @@ olarak hiçbiri ayarlanmamıştır).
 
 Uzantı **hiçbir veri toplamaz** — analiz yok, telemetri yok, izleme yok. Ayarlar
 yalnızca cihazınızdaki `chrome.storage.local` içinde saklanır. Tek ağ istekleri,
-indirilebilir bir yazı tipi seçtiğinizde Google Fonts / jsDelivr üzerinden alınan
+indirilebilir bir yazı tipi seçtiğinizde Google Fonts üzerinden alınan
 **yazı tipi dosyalarıdır**. Ayrıntılar için [PRIVACY.md](PRIVACY.md) dosyasına bakın.
 
 ---
@@ -82,7 +82,7 @@ indirilebilir bir yazı tipi seçtiğinizde Google Fonts / jsDelivr üzerinden a
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

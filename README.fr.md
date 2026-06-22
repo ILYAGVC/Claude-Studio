@@ -21,7 +21,7 @@ Une extension de navigateur Manifest V3 qui rend l'application web **Claude** (`
 - **Plus de 50 polices, regroupées par écriture** — persan, arabe, hébreu, ourdou, latin,
   cyrillique, devanagari, japonais, chinois, coréen, thaï, bengali — avec un sélecteur
   consultable et avec aperçu ainsi que des filtres par langue. Des polices distinctes pour
-  le corps de texte, les titres et le code — chacune étant une police web téléchargeable (Google Fonts / jsDelivr).
+  le corps de texte, les titres et le code — chacune étant une police web téléchargeable (Google Fonts).
 - **Typographie** — taille, graisse, hauteur de ligne, espacement des lettres/mots/paragraphes
   et une limite de largeur de lecture, le tout avec des curseurs en direct.
 - **Chiffres locaux** — affichez les nombres dans les chiffres propres à votre langue (persan,
@@ -56,7 +56,7 @@ défini par défaut).
 
 L'extension **ne collecte aucune donnée** — pas d'analyse, pas de télémétrie, pas de suivi.
 Les paramètres sont stockés uniquement dans `chrome.storage.local` sur votre appareil. Les seules
-requêtes réseau sont les **fichiers de polices** récupérés depuis Google Fonts / jsDelivr lorsque vous
+requêtes réseau sont les **fichiers de polices** récupérés depuis Google Fonts lorsque vous
 sélectionnez une police téléchargeable. Voir [PRIVACY.md](PRIVACY.md) pour plus de détails.
 
 ---
@@ -78,7 +78,7 @@ sélectionnez une police téléchargeable. Voir [PRIVACY.md](PRIVACY.md) pour pl
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js

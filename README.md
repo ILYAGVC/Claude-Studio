@@ -21,7 +21,7 @@ A Manifest V3 browser extension that makes the **Claude** web app (`claude.ai` /
 - **50+ fonts, grouped by script** — Persian, Arabic, Hebrew, Urdu, Latin,
   Cyrillic, Devanagari, Japanese, Chinese, Korean, Thai, Bengali — with a
   searchable, previewing picker and per‑language filter chips. Separate fonts for
-  body, headings, and code — each a downloadable web font (Google Fonts / jsDelivr).
+  body, headings, and code — each a downloadable web font (Google Fonts).
 - **Typography** — font size, weight, line height, letter/word/paragraph spacing,
   and a reading‑width limit, all with live sliders.
 - **Local numerals** — show numbers in your language’s own digits (Persian,
@@ -56,7 +56,7 @@ set by default).
 
 The extension **collects no data** — no analytics, no telemetry, no tracking.
 Settings are stored only in `chrome.storage.local` on your device. The only
-network requests are **font files** fetched from Google Fonts / jsDelivr when you
+network requests are **font files** fetched from Google Fonts when you
 select a downloadable font. See [PRIVACY.md](PRIVACY.md) for details.
 
 ---
@@ -78,7 +78,7 @@ select a downloadable font. See [PRIVACY.md](PRIVACY.md) for details.
     │   ├── content.js         # core engine (direction, scope, theme, digits)
     │   └── inject.css         # injected page styles
     ├── background/
-    │   └── sw.js              # service worker (CSP rule, re-injection, shortcut)
+    │   └── sw.js              # service worker (re-injection, shortcut)
     └── popup/
         ├── popup.html
         ├── theme-init.js      # early theme paint (avoids flash on open)
