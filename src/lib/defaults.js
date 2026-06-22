@@ -94,7 +94,7 @@
 
     /* --- Settings panel appearance --- */
     uiLang: detectUiLang(), // interface language; first run follows the Chrome/browser locale
-    theme: "system", // system | light | dark
+    theme: "system", // system | light | dark | black
     accent: "#D97757",
     previewHeight: 200,    // live preview height (px) — adjustable with the mouse
     previewCollapsed: true // preview is collapsed by default

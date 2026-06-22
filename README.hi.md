@@ -67,6 +67,7 @@
 .
 ├── manifest.json              # MV3 manifest
 ├── icons/                     # icon.svg + 16/32/48/128 PNGs
+├── _locales/                  # chrome.i18n manifest strings (25 languages)
 ├── PRIVACY.md
 └── src/
     ├── lib/

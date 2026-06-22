@@ -60,6 +60,7 @@ jsDelivr 获取的 **字体文件**。详情请参阅 [PRIVACY.md](PRIVACY.md)�
 .
 ├── manifest.json              # MV3 manifest
 ├── icons/                     # icon.svg + 16/32/48/128 PNGs
+├── _locales/                  # chrome.i18n manifest strings (25 languages)
 ├── PRIVACY.md
 └── src/
     ├── lib/
