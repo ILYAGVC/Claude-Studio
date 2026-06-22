@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL وخطوط وسمات",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "دعم كامل لاتجاه RTL في محادثات Claude مع خطوط متعددة اللغات وطباعة احترافية وعرض صحيح للرياضيات والشيفرة.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "تشغيل/إيقاف الإضافة",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

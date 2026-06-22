@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, lettertypen en thema's",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Volledige RTL voor Claude-chats, met meertalige lettertypen, verzorgde typografie en correcte wiskunde en code.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "De extensie in-/uitschakelen",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

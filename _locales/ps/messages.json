@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL، فونټونه او ترشکلونه",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "د Claude خبرو لپاره بشپړ RTL، له څوژبیزو فونټونو، ښکلې ټایپوګرافۍ، او سم ریاضي او کوډ سره.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "افزونه چالان/بند کړئ",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, yazı tipleri ve temalar",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Claude sohbetleri için tam RTL desteği; çok dilli yazı tipleri, özenli tipografi ve doğru matematik ve kod gösterimiyle.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "Uzantıyı aç/kapat",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

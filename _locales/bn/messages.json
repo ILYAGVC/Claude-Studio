@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, ফন্ট ও থিম",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Claude চ্যাটের জন্য সম্পূর্ণ RTL, বহুভাষিক ফন্ট, পরিপাটি টাইপোগ্রাফি এবং সঠিক গণিত ও কোডসহ।",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "এক্সটেনশন চালু/বন্ধ করুন",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

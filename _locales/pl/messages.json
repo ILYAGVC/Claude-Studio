@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, czcionki i motywy",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Pełne RTL dla rozmów z Claude, z wielojęzycznymi czcionkami, dopracowaną typografią oraz poprawną matematyką i kodem.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "Włącz/wyłącz rozszerzenie",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

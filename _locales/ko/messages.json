@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, 글꼴 & 테마",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "다국어 글꼴, 깔끔한 타이포그래피, 정확한 수식과 코드를 갖춘 Claude 채팅 전용 완전 RTL 지원.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "확장 프로그램 켜기/끄기",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

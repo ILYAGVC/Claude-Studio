@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — 从右到左、字体与主题",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "为 Claude 对话提供完整的从右到左支持，搭配多语言字体、精致排版，以及正确的公式和代码显示。",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "开启/关闭扩展",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

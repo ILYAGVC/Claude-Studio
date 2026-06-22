@@ -1,0 +1,5 @@
+{
+  "appName":   { "message": "Claude Studio — RTL, polices et thèmes",        "description": "Extension name (browser + store title)" },
+  "appDesc":   { "message": "RTL complet pour les conversations Claude : polices multilingues, typographie soignée et rendu correct des formules et du code.", "description": "Extension description for the store listing" },
+  "cmdToggle": { "message": "Activer ou désactiver l'extension","description": "toggle-rtl keyboard command description" }
+}

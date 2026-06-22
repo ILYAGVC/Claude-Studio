@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, шрифти й теми",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Повний RTL для чатів Claude з багатомовними шрифтами, охайною типографікою та коректними формулами й кодом.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "Увімкнути/вимкнути розширення",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

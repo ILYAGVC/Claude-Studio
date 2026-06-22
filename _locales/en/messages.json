@@ -1,0 +1,5 @@
+{
+  "appName":   { "message": "Claude Studio — RTL, Fonts & Themes",        "description": "Extension name (browser + store title)" },
+  "appDesc":   { "message": "RTL & multilingual support for Claude: 50+ fonts, pro typography, light/dark/black themes, accent colors, and correct math & code.", "description": "Extension description for the store listing" },
+  "cmdToggle": { "message": "Turn the extension on/off","description": "toggle-rtl keyboard command description" }
+}

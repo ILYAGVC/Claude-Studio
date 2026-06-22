@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, γραμματοσειρές & θέματα",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Πλήρης υποστήριξη RTL στο Claude, με πολύγλωσσες γραμματοσειρές, εκλεπτυσμένη τυπογραφία και σωστή απόδοση μαθηματικών και κώδικα.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "Ενεργοποίηση/απενεργοποίηση της επέκτασης",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "appName":   { "message": "Claude Studio — RTL, Schriften & Designs",        "description": "Extension name (browser + store title)" },
+  "appDesc":   { "message": "Vollständiges RTL für Claude-Chats, mit mehrsprachigen Schriften, sauberer Typografie sowie korrekter Mathematik und Code.", "description": "Extension description for the store listing" },
+  "cmdToggle": { "message": "Erweiterung ein- oder ausschalten","description": "toggle-rtl keyboard command description" }
+}

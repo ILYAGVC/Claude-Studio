@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — راست‌چین، فونت و تم",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "راست‌چین‌سازیِ کاملِ گفتگوهای Claude همراه با فونت‌های چندزبانه، تایپوگرافیِ حرفه‌ای و نمایشِ درستِ ریاضی و کد.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "روشن/خاموش کردن افزونه",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

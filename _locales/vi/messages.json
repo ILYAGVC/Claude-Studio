@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, phông chữ & giao diện",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Hỗ trợ RTL đầy đủ cho trò chuyện Claude, với phông chữ đa ngôn ngữ, kiểu chữ tinh tế, cùng công thức toán và mã hiển thị chuẩn xác.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "Bật/tắt tiện ích",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

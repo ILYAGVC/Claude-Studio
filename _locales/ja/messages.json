@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL・フォント・テーマ",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Claudeのチャットを完全にRTL化。多言語フォント、洗練されたタイポグラフィ、正確な数式とコード表示に対応。",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "拡張機能をオン/オフ",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

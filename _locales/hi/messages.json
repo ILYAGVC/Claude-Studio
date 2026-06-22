@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, फ़ॉन्ट और थीम",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "Claude चैट के लिए पूरा RTL, साथ में बहुभाषी फ़ॉन्ट, बेहतरीन टाइपोग्राफ़ी, और सही गणित व कोड।",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "एक्सटेंशन चालू/बंद करें",
+    "description": "toggle-rtl keyboard command description"
+  }
+}

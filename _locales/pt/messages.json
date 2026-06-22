@@ -1,0 +1,5 @@
+{
+  "appName":   { "message": "Claude Studio — RTL, tipos de letra e temas",        "description": "Extension name (browser + store title)" },
+  "appDesc":   { "message": "RTL completo para as conversas do Claude, com tipos de letra multilingues, tipografia cuidada e fórmulas e código corretos.", "description": "Extension description for the store listing" },
+  "cmdToggle": { "message": "Ativar ou desativar a extensão","description": "toggle-rtl keyboard command description" }
+}

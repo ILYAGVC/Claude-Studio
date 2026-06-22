@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "Claude Studio — RTL, font & tema",
+    "description": "Extension name (browser + store title)"
+  },
+  "appDesc": {
+    "message": "RTL penuh untuk obrolan Claude, dengan font multibahasa, tipografi rapi, serta matematika dan kode yang benar.",
+    "description": "Extension description for the store listing"
+  },
+  "cmdToggle": {
+    "message": "Aktifkan/nonaktifkan ekstensi",
+    "description": "toggle-rtl keyboard command description"
+  }
+}
