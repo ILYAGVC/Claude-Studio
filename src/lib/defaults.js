@@ -77,7 +77,7 @@
     letterSpacing: 0,      // -1..3 (px)
     wordSpacing: 0,        // 0..10 (px)
     paragraphSpacing: 0.2, // 0..1.5 (em)
-    align: "start",        // start (follows direction) | right | justify | left
+    align: "start",        // start (follows direction) | right | center | left | justify
     readingWidthEnabled: false,
     readingWidth: 820,     // 560..1200 (px)
     persianDigits: false,  // convert Latin digits to Persian in text

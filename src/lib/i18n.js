@@ -1,6 +1,6 @@
 /* ===================================================================
  *  Claude RTL — user interface translations (i18n)
- *  Languages: Persian, Arabic, Hebrew, Urdu, English
+ *  Languages: 25 UI languages (5 RTL: Persian, Arabic, Hebrew, Urdu, Pashto; 20 LTR — see LANGS below)
  * =================================================================== */
 (function () {
   "use strict";
