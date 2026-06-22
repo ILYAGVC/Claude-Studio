@@ -469,5 +469,5 @@ kbd { background: var(--bg-3); border: 1px solid var(--border-2); border-bottom-
 /* Slim scrollbar */
 .content::-webkit-scrollbar, .preview-body::-webkit-scrollbar, .textarea::-webkit-scrollbar, .cselect-options::-webkit-scrollbar { width: 8px; height: 8px; }
 .content::-webkit-scrollbar-thumb, .preview-body::-webkit-scrollbar-thumb, .textarea::-webkit-scrollbar-thumb, .cselect-options::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 8px; }
-.content::-webkit-scrollbar-thumb:hover, .cselect-options::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+.content::-webkit-scrollbar-thumb:hover, .preview-body::-webkit-scrollbar-thumb:hover, .textarea::-webkit-scrollbar-thumb:hover, .cselect-options::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 .cselect-options::-webkit-scrollbar-track { background: transparent; }

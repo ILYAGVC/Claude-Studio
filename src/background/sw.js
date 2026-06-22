@@ -21,8 +21,7 @@ const CLAUDE_TABS = ["*://claude.ai/*", "*://*.claude.ai/*", "*://claude.com/*",
 
 /* --- Default settings: only the subset the SW reads (full defaults live in defaults.js) --- */
 const FALLBACK = {
-  enabled: true,
-  allowRemoteFonts: true
+  enabled: true
 };
 
 function getSettings() {
@@ -66,8 +65,8 @@ async function updateCspRule(allow) {
 
 async function syncCspFromSettings() {
   const s = (await getSettings()) || FALLBACK;
-  // Strip CSP only when on AND remote fonts allowed; unset (undefined) counts as on.
-  await updateCspRule(s.enabled !== false && s.allowRemoteFonts !== false);
+  // Strip CSP whenever the extension is on (unset/undefined counts as on) so web fonts load.
+  await updateCspRule(s.enabled !== false);
 }
 
 /* --- Re-inject content script + CSS into already-open Claude tabs ---
@@ -100,8 +99,7 @@ chrome.runtime.onInstalled.addListener(async () => {
   const s = await getSettings();
   if (!s) {
     await setSettings({
-      enabled: true,
-      allowRemoteFonts: true
+      enabled: true
     });
   }
   await syncCspFromSettings();
@@ -114,11 +112,11 @@ chrome.runtime.onStartup &&
     await injectClaudeTabs();
   });
 
-/* --- React to settings changes (enabled or allowRemoteFonts) --- */
+/* --- React to settings changes (enabled toggled) --- */
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes[KEY]) {
     const nv = changes[KEY].newValue || {};
-    updateCspRule(nv.enabled !== false && nv.allowRemoteFonts !== false);
+    updateCspRule(nv.enabled !== false);
   }
 });
 

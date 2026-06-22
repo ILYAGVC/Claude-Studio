@@ -36,10 +36,6 @@ standard request headers (User-Agent, Referer) as part of serving the file. We
 do not control and cannot access that data. No personal data is added to these
 requests by the extension.
 
-You can disable all remote font loading from **Settings → Advanced → Online fonts**.
-When it is off, the extension makes no requests to these CDNs and uses only fonts
-already available in your browser/operating system.
-
 ## Permissions and why they are used
 
 - **storage** — save your appearance settings locally on your device.

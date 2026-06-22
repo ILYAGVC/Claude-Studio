@@ -69,30 +69,6 @@
     vi: "Chủ đề khối mã", th: "ธีมกล่องโค้ด", el: "Θέμα μπλοκ κώδικα", bn: "কোড বক্স থিম",
     ps: "د کوډ بکس تم"
   };
-  const REMOTE_FONTS_TXT = {
-    fa: "فونت‌های اینترنتی", ar: "خطوط الإنترنت", he: "גופנים מקוונים", ur: "آن لائن فونٹس",
-    en: "Online fonts", es: "Fuentes en línea", fr: "Polices en ligne", de: "Online-Schriften",
-    pt: "Fontes online", ru: "Онлайн-шрифты", hi: "ऑनलाइन फ़ॉन्ट", id: "Font daring",
-    tr: "Çevrimiçi yazı tipleri", ja: "オンラインフォント", zh: "在线字体", ko: "온라인 글꼴",
-    it: "Font online", nl: "Online lettertypen", pl: "Czcionki online", uk: "Онлайн-шрифти",
-    vi: "Phông chữ trực tuyến", th: "ฟอนต์ออนไลน์", el: "Διαδικτυακές γραμματοσειρές", bn: "অনলাইন ফন্ট",
-    ps: "آنلاین فونټونه"
-  };
-  const REMOTE_FONTS_HINT = {
-    fa: "بارگذاری فونت از اینترنت (CDN). خاموش = بدون اینترنت.", ar: "تحميل الخطوط من الإنترنت (CDN). إيقاف = بدون إنترنت.",
-    he: "טעינת גופנים מהאינטרנט (CDN). כבוי = ללא אינטרנט.", ur: "انٹرنیٹ سے فونٹس لوڈ کریں (CDN)۔ بند = انٹرنیٹ کے بغیر۔",
-    en: "Load fonts from the internet (CDN). Off = no internet.", es: "Cargar fuentes de internet (CDN). Apagado = sin internet.",
-    fr: "Charger les polices depuis internet (CDN). Désactivé = hors ligne.", de: "Schriften aus dem Internet laden (CDN). Aus = offline.",
-    pt: "Carregar fontes da internet (CDN). Desligado = sem internet.", ru: "Загружать шрифты из интернета (CDN). Выкл = без интернета.",
-    hi: "इंटरनेट से फ़ॉन्ट लोड करें (CDN)। बंद = बिना इंटरनेट।", id: "Muat font dari internet (CDN). Mati = tanpa internet.",
-    tr: "Yazı tiplerini internetten yükle (CDN). Kapalı = internetsiz.", ja: "インターネット（CDN）からフォントを読み込む。オフ＝オフライン。",
-    zh: "从互联网（CDN）加载字体。关闭＝离线。", ko: "인터넷(CDN)에서 글꼴 로드. 끄면 오프라인.",
-    it: "Carica i font da internet (CDN). Off = offline.", nl: "Lettertypen van internet laden (CDN). Uit = offline.",
-    pl: "Ładuj czcionki z internetu (CDN). Wył. = bez internetu.", uk: "Завантажувати шрифти з інтернету (CDN). Вимк = без інтернету.",
-    vi: "Tải phông chữ từ internet (CDN). Tắt = không cần internet.", th: "โหลดฟอนต์จากอินเทอร์เน็ต (CDN) ปิด = ไม่ใช้อินเทอร์เน็ต",
-    el: "Φόρτωση γραμματοσειρών από το internet (CDN). Ανενεργό = χωρίς internet.", bn: "ইন্টারনেট থেকে ফন্ট লোড করুন (CDN)। বন্ধ = ইন্টারনেট ছাড়া।",
-    ps: "له انټرنیټ (CDN) فونټونه پورته کړئ. بند = بې انټرنیټه."
-  };
 
   /* ---------- storage ---------- */
   function load() {
@@ -566,10 +542,12 @@
     // Effective weights: apply a chosen weight only when the font ships more than one
     // (mirrors content.js — a single-weight font's slider is locked, so a leftover weight
     // must not synthesize fake bold).
-    const _bs = FONTS.weightStops(FONTS.get("text", S.font));
-    const effBodyWeight = S.fontWeight !== "default" && !(_bs && _bs.length <= 1) ? FONTS.nearestWeight(FONTS.get("text", S.font), S.fontWeight) : "";
-    const _cs = FONTS.weightStops(FONTS.get("mono", S.codeFont));
-    const effCodeWeight = S.codeFontWeight !== "default" && !(_cs && _cs.length <= 1) ? FONTS.nearestWeight(FONTS.get("mono", S.codeFont), S.codeFontWeight) : "";
+    const _tf = FONTS.get("text", S.font);
+    const _bs = FONTS.weightStops(_tf);
+    const effBodyWeight = S.fontWeight !== "default" && !(_bs && _bs.length <= 1) ? FONTS.nearestWeight(_tf, S.fontWeight) : "";
+    const _mf = FONTS.get("mono", S.codeFont);
+    const _cs = FONTS.weightStops(_mf);
+    const effCodeWeight = S.codeFontWeight !== "default" && !(_cs && _cs.length <= 1) ? FONTS.nearestWeight(_mf, S.codeFontWeight) : "";
     prev.querySelectorAll("pre, pre *, code").forEach((el) => {
       el.style.fontFamily = S.codeFont === "default" ? "" : stackFor("mono", S.codeFont);
       el.style.fontWeight = effCodeWeight;
@@ -890,8 +868,6 @@
     // which adapts each to the selected font's real weights.
     const cwl = $("codeWeightLabel"); if (cwl) cwl.textContent = CODE_WEIGHT_TXT[S.uiLang] || CODE_WEIGHT_TXT.en;
     const cbl = $("codeBgLabel"); if (cbl) cbl.textContent = CODE_BG_TXT[S.uiLang] || CODE_BG_TXT.en;
-    const rfl = $("remoteFontsLabel"); if (rfl) rfl.textContent = REMOTE_FONTS_TXT[S.uiLang] || REMOTE_FONTS_TXT.en;
-    const rfh = $("remoteFontsHint"); if (rfh) rfh.textContent = REMOTE_FONTS_HINT[S.uiLang] || REMOTE_FONTS_HINT.en;
     updateWeightLock(); // weight sliders only adjustable for fonts that ship multiple weights
 
     setSlider("fontSizePx", S.fontSizePx, (v) => v + "px");
@@ -914,7 +890,6 @@
 
     $("keepMathLtr").checked = !!S.keepMathLtr;
     $("keepCodeLtr").checked = !!S.keepCodeLtr;
-    $("allowRemoteFonts").checked = !!S.allowRemoteFonts;
     $("customCss").value = S.customCss || "";
     setSeg("theme", S.theme);
 
@@ -1077,7 +1052,6 @@
     // advanced
     bindCheckbox("keepMathLtr", (v) => (S.keepMathLtr = v));
     bindCheckbox("keepCodeLtr", (v) => (S.keepCodeLtr = v));
-    bindCheckbox("allowRemoteFonts", (v) => (S.allowRemoteFonts = v));
     $("customCss").addEventListener("input", (e) => {
       S.customCss = e.target.value;
       save();

@@ -70,7 +70,6 @@
     fontWeight: "default",  // default | 100..900 (applied via font-variation-settings)
     codeFontWeight: "default", // code/monospace weight: default | 100..900
     codeBg: "default",      // code-block background: "default" (Claude's own) or a hex colour
-    allowRemoteFonts: true, // allow loading fonts from the internet (CDN)
 
     /* --- Typography --- */
     fontSizePx: 16,        // 12..30

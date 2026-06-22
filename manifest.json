@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Claude Studio — RTL, Fonts & Themes",
   "short_name": "Claude Studio",
-  "version": "1.13.45",
+  "version": "1.13.46",
   "description": "RTL & multilingual support for Claude: 50+ fonts, pro typography, light/dark/black themes, accent colors, and correct math & code.",
   "icons": {
     "16": "icons/icon16.png",

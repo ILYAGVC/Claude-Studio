@@ -23,7 +23,7 @@ jobs:
         run: |
           VER=$(node -p "require('./manifest.json').version")
           echo "Packaging Claude Studio v$VER"
-          zip -r "Claude-Studio-$VER.zip" manifest.json src icons
+          zip -r "Claude-Studio-$VER.zip" manifest.json src icons -x "icons/icon.svg"
           echo "ZIP=Claude-Studio-$VER.zip" >> "$GITHUB_ENV"
 
       - name: Upload as workflow artifact

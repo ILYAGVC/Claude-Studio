@@ -103,7 +103,6 @@
     (document.head || ROOT).appendChild(link);
   }
   function loadFonts() {
-    if (!settings.allowRemoteFonts) return;
     const want = [];
     want.push(FONTS.get("text", settings.font).load);
     if (settings.headingFont && settings.headingFont !== "inherit") {
@@ -497,14 +496,15 @@
   Object.keys(DIGIT_SETS).forEach((k) => DIGIT_SETS[k].split("").forEach((ch, i) => { EAST_TO_LATIN[ch] = String(i); }));
   const EAST_CHARS = Object.keys(EAST_TO_LATIN).join("");
   const EAST_RE = EAST_CHARS ? new RegExp("[" + EAST_CHARS + "]", "g") : null;
+  // Non-global twin of EAST_RE for .test(): a /g regex advances lastIndex between calls.
+  const EAST_TEST_RE = EAST_CHARS ? new RegExp("[" + EAST_CHARS + "]") : null;
   const digitOriginals = new WeakMap();
   const touchedDigitNodes = new Set();
   function activeDigits() { const s = DIGIT_SETS[settings.uiLang]; return s ? s.split("") : null; }
-  function toLocal(str) { const a = activeDigits(); return a ? str.replace(/[0-9]/g, (d) => a[+d]) : str; }
   function toLatin(str) { return EAST_RE ? str.replace(EAST_RE, (ch) => EAST_TO_LATIN[ch]) : str; }
-  function hasEastern(str) { return EAST_CHARS ? new RegExp("[" + EAST_CHARS + "]").test(str) : false; }
+  function hasEastern(str) { return EAST_TEST_RE ? EAST_TEST_RE.test(str) : false; }
   function convertDigits(blockEl, allowAnchor) {
-    if (!activeDigits()) return; // current UI language uses standard Western digits
+    const digits = activeDigits(); if (!digits) return; // hoist once; null = UI language uses Western digits
     // Never rewrite numerals inside the live editor: converting a typed Western
     // digit would send Eastern digits to Claude and desync ProseMirror's model
     // (caret jumps, dropped chars). Direction is applied separately.
@@ -539,7 +539,7 @@
       // Eastern/Western digits while typing) so restore never writes mixed text.
       const latin = toLatin(n.nodeValue);
       digitOriginals.set(n, latin);
-      const loc = toLocal(latin);
+      const loc = latin.replace(/[0-9]/g, (d) => digits[+d]);
       if (loc !== n.nodeValue) {
         n.nodeValue = loc;
         touchedDigitNodes.add(n);
