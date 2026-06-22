@@ -19,3 +19,8 @@ web-ext-artifacts/
 *.tmp
 _*.js
 *.log
+
+# Stray browser test-profile dirs (must never reach the repo or the store zip;
+# Chrome/Edge reject any extension folder containing a "_"-prefixed dir except _locales).
+/_vp2/
+/_vp[0-9]*/

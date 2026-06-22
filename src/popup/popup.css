@@ -194,6 +194,9 @@ body {
 }
 .master input:checked + .switch { background: var(--accent); border-color: var(--accent); }
 .master input:checked + .switch::after { transform: translateX(-20px); }
+/* Toggles default to RTL (knob rests on the right, slides left when on); mirror for LTR UI languages. */
+html[dir="ltr"] .master .switch::after { right: auto; left: 3px; }
+html[dir="ltr"] .master input:checked + .switch::after { transform: translateX(20px); }
 
 /* ---------- Tabs ---------- */
 .tabs {
@@ -282,6 +285,8 @@ body {
 .switch.sm i::after { content: ""; position: absolute; top: 2px; right: 2px; width: 17px; height: 17px; background: #fff; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
 .switch.sm input:checked + i { background: var(--accent); border-color: var(--accent); }
 .switch.sm input:checked + i::after { transform: translateX(-17px); }
+html[dir="ltr"] .switch.sm i::after { right: auto; left: 2px; }
+html[dir="ltr"] .switch.sm input:checked + i::after { transform: translateX(17px); }
 
 /* ---------- Fields ---------- */
 .field { margin-bottom: 14px; }
@@ -294,6 +299,8 @@ body {
 }
 .select:focus, .input:focus, .textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2397938b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 10px center; background-size: 15px; padding-left: 32px; }
+/* Chevron + its padding sit on the left for RTL; move them to the right for LTR UI languages. */
+html[dir="ltr"] .select { background-position: right 10px center; padding-left: 11px; padding-right: 32px; }
 .textarea { resize: vertical; font-family: "Fira Code", Consolas, monospace; direction: ltr; text-align: left; line-height: 1.6; }
 
 /* ---------- Sliders ---------- */
@@ -407,7 +414,7 @@ kbd { background: var(--bg-3); border: 1px solid var(--border-2); border-bottom-
 .cselect-options { max-height: 200px; overflow: auto; padding: 4px; }
 .cselect-group { font-size: 10px; font-weight: 800; color: var(--text-3); padding: 8px 10px 4px; letter-spacing: 0.3px; position: sticky; top: -4px; background: var(--bg); text-transform: uppercase; }
 .cselect-group:first-child { padding-top: 4px; }
-.cselect-opt { width: 100%; text-align: right; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 14.5px; padding: 9px 10px; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: 0.1s; }
+.cselect-opt { width: 100%; text-align: start; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 14.5px; padding: 9px 10px; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: 0.1s; }
 .cselect-opt:hover { background: var(--bg-3); }
 .cselect-opt.is-selected { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
 .cselect-opt .opt-check { opacity: 0; flex-shrink: 0; }
