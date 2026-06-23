@@ -1141,7 +1141,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "claude-rtl-settings.json";
+    a.download = "claude-studio-settings.json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -1172,6 +1172,7 @@
     S = s;
     S.previewCollapsed = true; // always start collapsed each time the popup opens
     tt = I18N.dict(S.uiLang || "fa");
+    I18N.apply(S.uiLang || "fa"); // translate labels first — the pickers' aria-labels read label text at build time
     buildLangPicker();
     buildFontPickers();
     buildAccentSwatches();
@@ -1179,7 +1180,6 @@
     buildCodeBgSwatches();
     buildShortcuts();
     initResizer();
-    I18N.apply(S.uiLang || "fa");
     renderPreviewContent();
     render();
     bindAll();

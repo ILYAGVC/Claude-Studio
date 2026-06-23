@@ -509,6 +509,9 @@
     // digit would send Eastern digits to Claude and desync ProseMirror's model
     // (caret jumps, dropped chars). Direction is applied separately.
     if (blockEl.closest && blockEl.closest('[contenteditable="true"], [contenteditable=""], .ProseMirror')) return;
+    // Cheap pre-gate: a block with no digits at all has nothing to convert and nothing
+    // we previously converted to re-baseline, so skip the selection bookkeeping + walk.
+    if (!/[0-9]/.test(blockEl.textContent) && !hasEastern(blockEl.textContent)) return;
     // By default skip links so digits inside inline URLs/refs are left alone.
     // The sidebar chat list is itself an <a>, so it passes allowAnchor=true.
     const skipSel = allowAnchor ? SEL_SKIP : SEL_SKIP + ",a";
@@ -533,7 +536,7 @@
         return NodeFilter.FILTER_ACCEPT;
       }
     });
-    let n;
+    let n, changed = false;
     while ((n = walker.nextNode())) {
       // Cache a pristine Latin baseline (even for a partly-converted node — mixed
       // Eastern/Western digits while typing) so restore never writes mixed text.
@@ -543,9 +546,12 @@
       if (loc !== n.nodeValue) {
         n.nodeValue = loc;
         touchedDigitNodes.add(n);
+        changed = true;
       }
     }
-    if (savedSel && savedSel.a.isConnected) {
+    // Only touch the selection if we actually rewrote text — a no-op pass must not
+    // rebuild (and possibly reverse) the user's current selection.
+    if (changed && savedSel && savedSel.a.isConnected) {
       try { sel.setBaseAndExtent(savedSel.a, savedSel.ao, savedSel.f || savedSel.a, savedSel.fo); } catch (e) {}
     }
   }
@@ -627,8 +633,14 @@
     if (aborted) return;
     if (!contextValid()) { selfShutdown(true); return; }
     if (!active()) return;
-    for (const n of nodes) {
-      if (n === ROOT || (n.isConnected !== false)) processSubtree(n);
+    // A queued full-document pass (schedule(ROOT)) already covers every other pending
+    // node, so process ROOT alone instead of re-walking the same subtrees twice.
+    if (nodes.indexOf(ROOT) !== -1) {
+      processSubtree(ROOT);
+    } else {
+      for (const n of nodes) {
+        if (n.isConnected !== false) processSubtree(n);
+      }
     }
     // Keep the digit-tracking Set from growing unbounded during long sessions.
     if (touchedDigitNodes.size > 400) touchedDigitNodes.forEach((n) => { if (!n.isConnected) touchedDigitNodes.delete(n); });

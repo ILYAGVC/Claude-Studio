@@ -137,7 +137,7 @@
       }
     }
     // --- Migrations ---
-    const sv = (saved && saved.version) || 1;
+    const sv = Number(saved && saved.version) || 1; // coerce: a corrupt non-numeric version must still run migrations
     if (sv < 2) {
       // v1 defaulted align to "right", which broke LTR/auto; migrate to "start"
       // (follows direction) so it works in all of LTR/RTL/auto.
@@ -201,6 +201,12 @@
         if (!Object.prototype.hasOwnProperty.call(d, kk)) { delete o[kk]; continue; } // drop legacy nested flags
         o[kk] = o[kk] === true || o[kk] === "true";
       }
+    });
+    // Same coercion for the top-level boolean flags: an imported/hand-edited string
+    // like "false" is truthy and would otherwise read as ON (see active() in content.js).
+    // Only touch non-booleans so a genuine stored true/false is never altered.
+    ["enabled", "persianDigits", "readingWidthEnabled", "keepMathLtr", "keepCodeLtr"].forEach(function (k) {
+      if (typeof out[k] !== "boolean") out[k] = out[k] === "true";
     });
     // Drop preset entries whose value isn't a plain object (corrupt/hostile import),
     // and prune each surviving snapshot to known keys so stale/legacy values don't
