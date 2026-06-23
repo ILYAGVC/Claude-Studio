@@ -2,24 +2,21 @@
  *  Claude RTL — font catalog (grouped by language)
  *  Each font: { id, label, stack, group (language), load }
  *  load = null → system/default font (no network load)
- *  load.type = 'google' → Google Fonts
+ *  load = { family, axis } → Google Fonts (axis = wght spec; omitted = single 400)
  * =================================================================== */
 (function () {
   "use strict";
 
-  const G = (family, axis) => ({ type: "google", family: family, axis: axis || "" });
+  const G = (family, axis) => ({ family: family, axis: axis || "" });
 
   function href(load) {
-    if (!load) return null;
-    if (load.type === "google") {
-      return (
-        "https://fonts.googleapis.com/css2?family=" +
-        load.family.replace(/ /g, "+") +
-        (load.axis ? ":wght@" + load.axis : "") +
-        "&display=swap"
-      );
-    }
-    return null;
+    if (!load) return null; // system/default font: no stylesheet
+    return (
+      "https://fonts.googleapis.com/css2?family=" +
+      load.family.replace(/ /g, "+") +
+      (load.axis ? ":wght@" + load.axis : "") +
+      "&display=swap"
+    );
   }
 
   /* Group names written in each language's own script */
@@ -166,21 +163,17 @@
     // full range. A single-element array means a single-weight font (slider should lock).
     weightStops: function (f) {
       if (!f || !f.load) return null; // system/inherit/default: unknown
-      const L = f.load;
-      if (L.type === "google") {
-        const ax = L.axis || "";
-        if (!ax) return [400]; // single static weight
-        let ws = [];
-        if (ax.indexOf("..") !== -1) {
-          const p = ax.split("..");
-          const a = parseInt(p[0], 10), b = parseInt(p[1], 10);
-          for (let w = 100; w <= 900; w += 100) if (w >= a && w <= b) ws.push(w);
-        } else {
-          ws = ax.split(";").map((x) => parseInt(x, 10)).filter((w) => w >= 100 && w <= 900 && w % 100 === 0);
-        }
-        return ws.length ? ws : [400];
+      const ax = f.load.axis || "";
+      if (!ax) return [400]; // single static weight
+      let ws = [];
+      if (ax.indexOf("..") !== -1) {
+        const p = ax.split("..");
+        const a = parseInt(p[0], 10), b = parseInt(p[1], 10);
+        for (let w = 100; w <= 900; w += 100) if (w >= a && w <= b) ws.push(w);
+      } else {
+        ws = ax.split(";").map((x) => parseInt(x, 10)).filter((w) => w >= 100 && w <= 900 && w % 100 === 0);
       }
-      return null;
+      return ws.length ? ws : [400];
     },
     // Snap a weight onto the nearest weight the font actually ships, so an out-of-range
     // value left over from another font is never applied verbatim (no synthesized bold).
