@@ -3,9 +3,11 @@ name: Package extension
 # Builds the store-ready extension zips and attaches them to a GitHub Release.
 #   * Chrome/Edge:  Claude-Studio-<ver>.zip          (manifest.json shipped as-is)
 #   * Firefox/AMO:  Claude-Studio-firefox-<ver>.zip  (the Chrome zip with only manifest.json swapped
-#                   for a Gecko-patched copy: background.scripts fallback + browser_specific_settings.gecko;
-#                   the source manifest.json is never modified, so the Chrome/Edge build is unaffected)
-#   * Push a tag like v1.0.7  -> a GitHub Release is created with both zips attached.
+#                   for a Gecko-patched copy: background.scripts fallback + browser_specific_settings.gecko)
+#   * Opera:        Claude-Studio-opera-<ver>.zip    (the Chrome zip with only manifest.json swapped for a
+#                   copy whose short_name is <= 12 chars, which Opera Add-ons requires)
+#                   The source manifest.json is never modified, so the Chrome/Edge build is unaffected.
+#   * Push a tag like v1.0.7  -> a GitHub Release is created with all the zips attached.
 #   * Or run this workflow manually (Actions tab -> Run workflow) -> download from the run's Artifacts.
 #
 # NOTE: do not name any env var `ZIP` — Info-ZIP's `zip` reads $ZIP/$ZIPOPT as default
@@ -65,6 +67,32 @@ jobs:
           '
           echo "FIREFOX_ZIP=Claude-Studio-firefox-$VER.zip" >> "$GITHUB_ENV"
 
+      - name: Build Opera zip (Chrome package + short_name <= 12 chars)
+        run: |
+          echo "Packaging Claude Studio v$VER (Opera)"
+          cp "$CHROME_ZIP" "Claude-Studio-opera-$VER.zip"
+          rm -rf _operapatch && mkdir -p _operapatch
+          node -e '
+            const fs = require("fs");
+            const m = require("./manifest.json");
+            // Opera Add-ons rejects short_name > 12 chars ("Claude Studio" = 13). Shorten it for Opera only.
+            m.short_name = "ClaudeStudio";
+            fs.writeFileSync("_operapatch/manifest.json", JSON.stringify(m, null, 2));
+          '
+          ( cd _operapatch && zip "$GITHUB_WORKSPACE/Claude-Studio-opera-$VER.zip" manifest.json )
+          # Gate: confirm short_name now fits Opera's 12-char limit.
+          unzip -p "Claude-Studio-opera-$VER.zip" manifest.json | node -e '
+            let s=""; process.stdin.on("data",d=>s+=d).on("end",()=>{
+              const m = JSON.parse(s);
+              if (!m.short_name || m.short_name.length > 12) {
+                console.error("Opera short_name still too long:", m.short_name, "len=" + (m.short_name || "").length);
+                process.exit(1);
+              }
+              console.log("Opera manifest OK -> short_name:", JSON.stringify(m.short_name), "len=" + m.short_name.length);
+            });
+          '
+          echo "OPERA_ZIP=Claude-Studio-opera-$VER.zip" >> "$GITHUB_ENV"
+
       - name: Verify Firefox build with Mozilla addons-linter (non-blocking)
         run: npx --yes addons-linter@latest "$FIREFOX_ZIP" || true
 
@@ -75,6 +103,7 @@ jobs:
           path: |
             ${{ env.CHROME_ZIP }}
             ${{ env.FIREFOX_ZIP }}
+            ${{ env.OPERA_ZIP }}
 
       - name: Attach to GitHub Release (only when a tag is pushed)
         if: startsWith(github.ref, 'refs/tags/')
@@ -83,4 +112,5 @@ jobs:
           files: |
             ${{ env.CHROME_ZIP }}
             ${{ env.FIREFOX_ZIP }}
+            ${{ env.OPERA_ZIP }}
           generate_release_notes: true
