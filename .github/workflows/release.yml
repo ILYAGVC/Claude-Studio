@@ -1,9 +1,12 @@
 name: Package extension
 
-# Builds the store-ready extension zip (manifest.json at the zip root + src/ + icons/,
-# forward-slash paths) so you can download it straight from GitHub — no local build needed.
-#   * Push a tag like v1.13.44  -> a GitHub Release is created with the zip attached.
-#   * Or run this workflow manually (Actions tab -> Run workflow) -> download it from the run's Artifacts.
+# Builds the store-ready extension zips and attaches them to a GitHub Release.
+#   * Chrome/Edge:  Claude-Studio-<ver>.zip          (manifest.json shipped as-is)
+#   * Firefox/AMO:  Claude-Studio-firefox-<ver>.zip  (manifest patched at build time for Gecko —
+#                   background.scripts fallback + browser_specific_settings.gecko; the source
+#                   manifest.json is never modified, so the Chrome/Edge build is unaffected)
+#   * Push a tag like v1.0.7  -> a GitHub Release is created with both zips attached.
+#   * Or run this workflow manually (Actions tab -> Run workflow) -> download from the run's Artifacts.
 
 on:
   push:
@@ -19,22 +22,50 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build extension zip
+      - name: Build Chrome/Edge zip
         run: |
           VER=$(node -p "require('./manifest.json').version")
-          echo "Packaging Claude Studio v$VER"
+          echo "Packaging Claude Studio v$VER (Chrome/Edge)"
           zip -r "Claude-Studio-$VER.zip" manifest.json src icons _locales -x "icons/icon.svg"
           echo "ZIP=Claude-Studio-$VER.zip" >> "$GITHUB_ENV"
+          echo "VER=$VER" >> "$GITHUB_ENV"
 
-      - name: Upload as workflow artifact
+      - name: Build Firefox zip (manifest patched for Gecko, source manifest untouched)
+        run: |
+          echo "Packaging Claude Studio v$VER (Firefox)"
+          mkdir -p build-firefox
+          cp -r src icons _locales build-firefox/
+          rm -f build-firefox/icons/icon.svg
+          node -e '
+            const fs = require("fs");
+            const m = require("./manifest.json");
+            // Firefox ignores background.service_worker (Gecko uses background.scripts) -> ship scripts only.
+            m.background = { scripts: [m.background.service_worker] };
+            // Firefox MV3 requires an explicit add-on id; declare that no user data is collected.
+            m.browser_specific_settings = {
+              gecko: { id: "claude-studio@ilyagvc", data_collection_permissions: { required: ["none"] } }
+            };
+            fs.writeFileSync("build-firefox/manifest.json", JSON.stringify(m, null, 2));
+          '
+          ( cd build-firefox && zip -r "../Claude-Studio-firefox-$VER.zip" manifest.json src icons _locales )
+          echo "ZIP_FF=Claude-Studio-firefox-$VER.zip" >> "$GITHUB_ENV"
+
+      - name: Verify Firefox build with Mozilla addons-linter (non-blocking)
+        run: npx --yes addons-linter@latest build-firefox || true
+
+      - name: Upload as workflow artifacts
         uses: actions/upload-artifact@v4
         with:
           name: claude-studio-extension
-          path: ${{ env.ZIP }}
+          path: |
+            ${{ env.ZIP }}
+            ${{ env.ZIP_FF }}
 
       - name: Attach to GitHub Release (only when a tag is pushed)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ZIP }}
+          files: |
+            ${{ env.ZIP }}
+            ${{ env.ZIP_FF }}
           generate_release_notes: true
