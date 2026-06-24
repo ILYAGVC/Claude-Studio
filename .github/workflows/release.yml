@@ -23,7 +23,7 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build Chrome/Edge zip
         run: |
@@ -69,7 +69,7 @@ jobs:
         run: npx --yes addons-linter@latest "$FIREFOX_ZIP" || true
 
       - name: Upload as workflow artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: claude-studio-extension
           path: |
@@ -78,7 +78,7 @@ jobs:
 
       - name: Attach to GitHub Release (only when a tag is pushed)
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             ${{ env.CHROME_ZIP }}
