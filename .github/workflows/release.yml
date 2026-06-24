@@ -2,9 +2,9 @@ name: Package extension
 
 # Builds the store-ready extension zips and attaches them to a GitHub Release.
 #   * Chrome/Edge:  Claude-Studio-<ver>.zip          (manifest.json shipped as-is)
-#   * Firefox/AMO:  Claude-Studio-firefox-<ver>.zip  (manifest patched at build time for Gecko —
-#                   background.scripts fallback + browser_specific_settings.gecko; the source
-#                   manifest.json is never modified, so the Chrome/Edge build is unaffected)
+#   * Firefox/AMO:  Claude-Studio-firefox-<ver>.zip  (the Chrome zip with only manifest.json swapped
+#                   for a Gecko-patched copy: background.scripts fallback + browser_specific_settings.gecko;
+#                   the source manifest.json is never modified, so the Chrome/Edge build is unaffected)
 #   * Push a tag like v1.0.7  -> a GitHub Release is created with both zips attached.
 #   * Or run this workflow manually (Actions tab -> Run workflow) -> download from the run's Artifacts.
 
@@ -30,12 +30,11 @@ jobs:
           echo "ZIP=Claude-Studio-$VER.zip" >> "$GITHUB_ENV"
           echo "VER=$VER" >> "$GITHUB_ENV"
 
-      - name: Build Firefox zip (manifest patched for Gecko, source manifest untouched)
+      - name: Build Firefox zip (Chrome package + manifest patched for Gecko)
         run: |
           echo "Packaging Claude Studio v$VER (Firefox)"
-          mkdir -p build-firefox
-          cp -r src icons _locales build-firefox/
-          rm -f build-firefox/icons/icon.svg
+          cp "$ZIP" "Claude-Studio-firefox-$VER.zip"
+          rm -rf _ffpatch && mkdir -p _ffpatch
           node -e '
             const fs = require("fs");
             const m = require("./manifest.json");
@@ -45,13 +44,17 @@ jobs:
             m.browser_specific_settings = {
               gecko: { id: "claude-studio@ilyagvc", data_collection_permissions: { required: ["none"] } }
             };
-            fs.writeFileSync("build-firefox/manifest.json", JSON.stringify(m, null, 2));
+            fs.writeFileSync("_ffpatch/manifest.json", JSON.stringify(m, null, 2));
           '
-          ( cd build-firefox && zip -r "../Claude-Studio-firefox-$VER.zip" manifest.json src icons _locales )
+          # Replace only the manifest.json entry inside the copied Chrome zip (absolute archive path, one input).
+          ( cd _ffpatch && zip "$GITHUB_WORKSPACE/Claude-Studio-firefox-$VER.zip" manifest.json )
+          test -f "Claude-Studio-firefox-$VER.zip" || { echo "ERROR: firefox zip missing"; exit 1; }
+          echo "Firefox manifest in the zip:"
+          unzip -p "Claude-Studio-firefox-$VER.zip" manifest.json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const m=JSON.parse(s);console.log(JSON.stringify({background:m.background,gecko:m.browser_specific_settings.gecko},null,2));})"
           echo "ZIP_FF=Claude-Studio-firefox-$VER.zip" >> "$GITHUB_ENV"
 
       - name: Verify Firefox build with Mozilla addons-linter (non-blocking)
-        run: npx --yes addons-linter@latest build-firefox || true
+        run: npx --yes addons-linter@latest "$ZIP_FF" || true
 
       - name: Upload as workflow artifacts
         uses: actions/upload-artifact@v4
